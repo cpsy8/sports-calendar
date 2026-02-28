@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import type { Fixture } from "./lib/fixtures";
 import { COMPETITION_COLORS, CARD_CLASSES } from "./lib/fixtures";
+import { fetchFixtures } from "./lib/fetch-fixtures";
 
 type ViewMode = "daily" | "weekly" | "monthly";
 
@@ -79,13 +80,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
-  const fetchFixtures = useCallback(async () => {
+  const loadFixtures = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/fixtures");
-      const data = await res.json();
-      setFixtures(data.fixtures ?? []);
-      setLastUpdated(data.updatedAt ?? null);
+      const data = await fetchFixtures();
+      setFixtures(data.fixtures);
+      setLastUpdated(data.updatedAt);
     } catch {
       setFixtures([]);
     } finally {
@@ -94,8 +94,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    fetchFixtures();
-  }, [fetchFixtures]);
+    loadFixtures();
+  }, [loadFixtures]);
 
   const weekDays = getWeekDays(centerDate);
 
@@ -176,7 +176,7 @@ export default function Home() {
 
             <button
               type="button"
-              onClick={fetchFixtures}
+              onClick={loadFixtures}
               disabled={loading}
               className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-medium transition-colors"
               title="Refresh fixtures"
