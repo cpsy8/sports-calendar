@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sports Calendar",
   description: "Football fixtures across top competitions",
+  icons: {
+    icon: "/assets/whistle.png",
+  },
 };
 
 export default function RootLayout({
