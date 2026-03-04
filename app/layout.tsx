@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "Sports Calendar",
   description: "Football fixtures across top competitions",
   icons: {
-    icon: "/assets/whistle.png",
+    icon: "assets/whistle.png",
   },
 };
 
