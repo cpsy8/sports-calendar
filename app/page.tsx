@@ -2,12 +2,11 @@
 
 import { useState, useCallback, useEffect } from "react";
 import type { Fixture } from "./lib/fixtures";
+import { fetchFixturesClient, type SportId } from "./lib/fetch-fixtures-client";
 import { HeaderBar } from "./components/HeaderBar";
 import { SportSelector, type SportOption } from "./components/SportSelector";
 import { FootballCard } from "./components/FootballCard";
 import { F1Card } from "./components/F1Card";
-
-type SportId = "all" | "football" | "f1";
 
 const SPORT_OPTIONS: SportOption[] = [
   { id: "all", label: "All sports" },
@@ -25,8 +24,7 @@ export default function Home() {
   const loadFixtures = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/fixtures?sport=${selectedSportId}`);
-      const data = await res.json();
+      const data = await fetchFixturesClient(selectedSportId);
       setFixtures(data.fixtures ?? []);
       setLastUpdated(data.updatedAt ?? null);
     } catch {
