@@ -85,18 +85,75 @@ async function fetchFromPostgres(sportId: SportId): Promise<Fixture[]> {
   return allFixtures;
 }
 
-async function fetchFromSupabase(): Promise<Fixture[]> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapSupabaseFootballRow(row: Record<string, any>): Fixture {
+  const dateStr = typeof row.date === "string"
+    ? row.date.split("T")[0]
+    : (row.date as Date).toISOString().split("T")[0];
+  return {
+    id: String(row.id),
+    sport: "football",
+    homeTeam: row.home_team,
+    awayTeam: row.away_team,
+    competition: row.competition,
+    competitionShort: row.competition_short,
+    kickoff: row.kickoff,
+    date: dateStr,
+    venue: row.venue ?? undefined,
+    status: row.status as Fixture["status"],
+    homeScore: row.home_score ?? undefined,
+    awayScore: row.away_score ?? undefined,
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapSupabaseF1Row(row: Record<string, any>): Fixture {
+  const dateStr = typeof row.date === "string"
+    ? row.date.split("T")[0]
+    : (row.date as Date).toISOString().split("T")[0];
+  return {
+    id: String(row.id),
+    sport: "f1",
+    homeTeam: row.circuit,
+    awayTeam: row.country,
+    competition: `Round ${row.round}`,
+    competitionShort: "F1",
+    kickoff: "14:00",
+    date: dateStr,
+    venue: row.country,
+    status: mapF1Status(row.status),
+  };
+}
+
+async function fetchFromSupabase(sportId: SportId = "all"): Promise<Fixture[]> {
   const supabase = createSupabaseClient();
   if (!supabase) return [];
 
-  const { data, error } = await supabase
-    .from("fixtures")
-    .select("*")
-    .order("date", { ascending: true })
-    .order("kickoff", { ascending: true });
+  const allFixtures: Fixture[] = [];
 
-  if (error || !data) return [];
-  return data.map(mapRowToFixture);
+  if (sportId === "f1" || sportId === "all") {
+    const { data } = await supabase
+      .from("f1_fixtures")
+      .select("*")
+      .order("date", { ascending: true });
+    if (data) allFixtures.push(...data.map(mapSupabaseF1Row));
+  }
+
+  if (sportId === "football" || sportId === "all") {
+    const { data } = await supabase
+      .from("football_fixtures")
+      .select("*")
+      .order("date", { ascending: true })
+      .order("kickoff", { ascending: true });
+    if (data) allFixtures.push(...data.map(mapSupabaseFootballRow));
+  }
+
+  allFixtures.sort((a, b) => {
+    const d = a.date.localeCompare(b.date);
+    return d !== 0 ? d : a.kickoff.localeCompare(b.kickoff);
+  });
+
+  return allFixtures;
 }
 
 /**
@@ -113,7 +170,7 @@ export async function fetchFixtures(sportId: SportId = "all"): Promise<{
   // Production: read from Supabase
   if (process.env.NODE_ENV === "production") {
     try {
-      const fixtures = await fetchFromSupabase();
+      const fixtures = await fetchFromSupabase(sportId);
       return { fixtures, updatedAt };
     } catch {
       return { fixtures: [], updatedAt };
