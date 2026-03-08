@@ -1,11 +1,14 @@
 import type { NextConfig } from "next";
 
-const isProd = process.env.NODE_ENV === "production";
+// GITHUB_ACTIONS is set automatically by GitHub Actions runners.
+// We only want `output: "export"` (static export) in CI — local builds
+// keep API routes working for dev.
+const isCI = process.env.GITHUB_ACTIONS === "true";
 
 const nextConfig: NextConfig = {
-  output: "export",
-  basePath: isProd ? "/sports-calendar" : "",
-  assetPrefix: isProd ? "/sports-calendar/" : "",
+  ...(isCI ? { output: "export" } : {}),
+  basePath: isCI ? "/sports-calendar" : "",
+  assetPrefix: isCI ? "/sports-calendar/" : "",
 };
 
 export default nextConfig;
