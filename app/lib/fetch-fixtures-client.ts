@@ -99,7 +99,7 @@ export async function fetchFixturesClient(sportId: SportId = "all"): Promise<{
   }
 
   // Local dev: delegate to the API route which reads from Docker Postgres.
-  const res = await fetch(`/api/fixtures?sport=${sportId}`);
+  const res = await fetch(`/api/fixtures/${sportId}`);
   if (!res.ok) return { fixtures: [], updatedAt };
   return res.json();
 }
