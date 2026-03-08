@@ -21,6 +21,7 @@ function mapRowToFixture(
       : (row.date as Date).toISOString().split("T")[0];
   return {
     id: String(row.id),
+    sport: "football" as const,
     homeTeam: row.homeTeam,
     awayTeam: row.awayTeam,
     competition: row.competition,
@@ -41,6 +42,7 @@ function mapF1RowToFixture(row: typeof f1Fixtures.$inferSelect): Fixture {
       : (row.date as Date).toISOString().split("T")[0];
   return {
     id: String(row.id),
+    sport: "f1" as const,
     homeTeam: row.circuit,
     awayTeam: row.country,
     competition: `Round ${row.round}`,

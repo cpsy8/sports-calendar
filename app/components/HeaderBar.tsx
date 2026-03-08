@@ -1,7 +1,5 @@
 "use client";
 
-export type ViewMode = "daily" | "weekly";
-
 function formatDateHeader(d: Date) {
   return d.toLocaleDateString("en-US", {
     month: "short",
@@ -12,10 +10,8 @@ function formatDateHeader(d: Date) {
 
 export interface HeaderBarProps {
   centerDate: Date;
-  viewMode: ViewMode;
   onPrev: () => void;
   onNext: () => void;
-  onViewModeChange: (mode: ViewMode) => void;
   onRefresh: () => void;
   loading?: boolean;
   lastUpdated?: string | null;
@@ -23,10 +19,8 @@ export interface HeaderBarProps {
 
 export function HeaderBar({
   centerDate,
-  viewMode,
   onPrev,
   onNext,
-  onViewModeChange,
   onRefresh,
   loading = false,
   lastUpdated = null,
@@ -96,47 +90,28 @@ export function HeaderBar({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5">
-            {(["daily", "weekly"] as const).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => onViewModeChange(mode)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize ${
-                  viewMode === mode
-                    ? "bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={onRefresh}
-            disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-medium transition-colors"
-            title="Refresh fixtures"
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={loading}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-medium transition-colors shrink-0"
+          title="Refresh fixtures"
+        >
+          <svg
+            className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <svg
-              className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-            Refresh
-          </button>
-        </div>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          Refresh
+        </button>
       </div>
       {lastUpdated && (
         <p className="text-[10px] text-slate-500 dark:text-slate-400 px-4 pb-2">

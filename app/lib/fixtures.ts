@@ -1,5 +1,6 @@
 export interface Fixture {
   id: string;
+  sport: "football" | "f1";
   homeTeam: string;
   awayTeam: string;
   competition: string;
@@ -33,6 +34,14 @@ export const CARD_CLASSES: Record<string, string> = {
   orange: "bg-orange-50 border-orange-200 text-orange-900 dark:bg-orange-950/50 dark:border-orange-800 dark:text-orange-100",
   red: "bg-red-50 border-red-200 text-red-900 dark:bg-red-950/50 dark:border-red-800 dark:text-red-100",
 };
+
+const F1_ROUNDS = [
+  { round: 1, circuit: "Bahrain International Circuit", country: "Bahrain" },
+  { round: 2, circuit: "Jeddah Corniche Circuit", country: "Saudi Arabia" },
+  { round: 3, circuit: "Albert Park Circuit", country: "Australia" },
+  { round: 4, circuit: "Suzuka International Racing Course", country: "Japan" },
+  { round: 5, circuit: "Shanghai International Circuit", country: "China" },
+];
 
 export function generateDummyFixtures(): Fixture[] {
   const today = new Date();
@@ -69,6 +78,7 @@ export function generateDummyFixtures(): Fixture[] {
 
       fixtures.push({
         id: String(id++),
+        sport: "football",
         homeTeam: t.home,
         awayTeam: t.away,
         competition: t.comp,
@@ -82,6 +92,31 @@ export function generateDummyFixtures(): Fixture[] {
       });
     }
   }
+
+  // Add F1 rounds spread across the date range
+  F1_ROUNDS.forEach((r, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + (i - 2) * 7);
+    const dateStr = date.toISOString().split("T")[0];
+    const daysFromToday = (i - 2) * 7;
+    const status: Fixture["status"] =
+      daysFromToday < 0 ? "finished" : daysFromToday === 0 ? "live" : "scheduled";
+
+    fixtures.push({
+      id: String(id++),
+      sport: "f1",
+      homeTeam: r.circuit,
+      awayTeam: r.country,
+      competition: `Round ${r.round}`,
+      competitionShort: "F1",
+      kickoff: "14:00",
+      date: dateStr,
+      venue: r.country,
+      status,
+    });
+  });
+
+  fixtures.sort((a, b) => a.date.localeCompare(b.date) || a.kickoff.localeCompare(b.kickoff));
 
   return fixtures;
 }

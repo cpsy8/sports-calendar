@@ -18,10 +18,7 @@ export function SportSelector({
 }: SportSelectorProps) {
   return (
     <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-sm">
-      <div className="px-4 py-2 flex items-center gap-3 overflow-x-auto">
-        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0">
-          Sport
-        </span>
+      <div className="px-4 py-2 flex items-center justify-center gap-3 overflow-x-auto">
         <div className="flex gap-2">
           {sports.map((sport) => {
             const isActive = sport.id === selectedSportId;
