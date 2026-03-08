@@ -20,6 +20,7 @@ export const COMPETITION_COLORS: Record<string, string> = {
   "Ligue 1": "sky",
   "UEFA Champions League": "emerald",
   "Eredivisie": "orange",
+  "F1": "red",
 };
 
 export const CARD_CLASSES: Record<string, string> = {
@@ -30,6 +31,7 @@ export const CARD_CLASSES: Record<string, string> = {
   sky: "bg-sky-50 border-sky-200 text-sky-900 dark:bg-sky-950/50 dark:border-sky-800 dark:text-sky-100",
   emerald: "bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-950/50 dark:border-emerald-800 dark:text-emerald-100",
   orange: "bg-orange-50 border-orange-200 text-orange-900 dark:bg-orange-950/50 dark:border-orange-800 dark:text-orange-100",
+  red: "bg-red-50 border-red-200 text-red-900 dark:bg-red-950/50 dark:border-red-800 dark:text-red-100",
 };
 
 export function generateDummyFixtures(): Fixture[] {
