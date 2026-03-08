@@ -1,5 +1,4 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import { createSupabaseClient } from "./supabase-client";
 import { getPostgresPool } from "./postgres-client";
 import { footballFixtures, f1Fixtures } from "./db-schema";
 import type { Fixture } from "./fixtures";
@@ -12,9 +11,7 @@ function mapF1Status(f1Status: string): Fixture["status"] {
   return "finished"; // completed, cancelled
 }
 
-function mapRowToFixture(
-  row: typeof footballFixtures.$inferSelect,
-): Fixture {
+function mapRowToFixture(row: typeof footballFixtures.$inferSelect): Fixture {
   const dateStr =
     typeof row.date === "string"
       ? row.date.split("T")[0]
@@ -54,133 +51,37 @@ function mapF1RowToFixture(row: typeof f1Fixtures.$inferSelect): Fixture {
   };
 }
 
-async function fetchFromPostgres(sportId: SportId): Promise<Fixture[]> {
-  const pool = getPostgresPool();
-  if (!pool) return [];
-
-  const db = drizzle(pool);
-  const allFixtures: Fixture[] = [];
-
-  if (sportId === "f1" || sportId === "all") {
-    const rows = await db
-      .select()
-      .from(f1Fixtures)
-      .orderBy(f1Fixtures.date);
-    allFixtures.push(...rows.map(mapF1RowToFixture));
-  }
-
-  if (sportId === "football" || sportId === "all") {
-    const rows = await db
-      .select()
-      .from(footballFixtures)
-      .orderBy(footballFixtures.date, footballFixtures.kickoff);
-    allFixtures.push(...rows.map(mapRowToFixture));
-  }
-
-  allFixtures.sort((a, b) => {
-    const d = a.date.localeCompare(b.date);
-    return d !== 0 ? d : a.kickoff.localeCompare(b.kickoff);
-  });
-
-  return allFixtures;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapSupabaseFootballRow(row: Record<string, any>): Fixture {
-  const dateStr = typeof row.date === "string"
-    ? row.date.split("T")[0]
-    : (row.date as Date).toISOString().split("T")[0];
-  return {
-    id: String(row.id),
-    sport: "football",
-    homeTeam: row.home_team,
-    awayTeam: row.away_team,
-    competition: row.competition,
-    competitionShort: row.competition_short,
-    kickoff: row.kickoff,
-    date: dateStr,
-    venue: row.venue ?? undefined,
-    status: row.status as Fixture["status"],
-    homeScore: row.home_score ?? undefined,
-    awayScore: row.away_score ?? undefined,
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function mapSupabaseF1Row(row: Record<string, any>): Fixture {
-  const dateStr = typeof row.date === "string"
-    ? row.date.split("T")[0]
-    : (row.date as Date).toISOString().split("T")[0];
-  return {
-    id: String(row.id),
-    sport: "f1",
-    homeTeam: row.circuit,
-    awayTeam: row.country,
-    competition: `Round ${row.round}`,
-    competitionShort: "F1",
-    kickoff: "14:00",
-    date: dateStr,
-    venue: row.country,
-    status: mapF1Status(row.status),
-  };
-}
-
-async function fetchFromSupabase(sportId: SportId = "all"): Promise<Fixture[]> {
-  const supabase = createSupabaseClient();
-  if (!supabase) return [];
-
-  const allFixtures: Fixture[] = [];
-
-  if (sportId === "f1" || sportId === "all") {
-    const { data } = await supabase
-      .from("f1_fixtures")
-      .select("*")
-      .order("date", { ascending: true });
-    if (data) allFixtures.push(...data.map(mapSupabaseF1Row));
-  }
-
-  if (sportId === "football" || sportId === "all") {
-    const { data } = await supabase
-      .from("football_fixtures")
-      .select("*")
-      .order("date", { ascending: true })
-      .order("kickoff", { ascending: true });
-    if (data) allFixtures.push(...data.map(mapSupabaseFootballRow));
-  }
-
-  allFixtures.sort((a, b) => {
-    const d = a.date.localeCompare(b.date);
-    return d !== 0 ? d : a.kickoff.localeCompare(b.kickoff);
-  });
-
-  return allFixtures;
-}
-
-/**
- * Fetch fixtures from the appropriate source:
- * - Production (`NODE_ENV === "production"`): Supabase
- * - Development / all other envs: local Postgres (Docker)
- */
 export async function fetchFixtures(sportId: SportId = "all"): Promise<{
   fixtures: Fixture[];
   updatedAt: string;
 }> {
   const updatedAt = new Date().toISOString();
+  const pool = getPostgresPool();
+  if (!pool) return { fixtures: [], updatedAt };
 
-  // Production: read from Supabase
-  if (process.env.NODE_ENV === "production") {
-    try {
-      const fixtures = await fetchFromSupabase(sportId);
-      return { fixtures, updatedAt };
-    } catch {
-      return { fixtures: [], updatedAt };
-    }
-  }
-
-  // Development / non-production: read from local Postgres
   try {
-    const fixtures = await fetchFromPostgres(sportId);
-    return { fixtures, updatedAt };
+    const db = drizzle(pool);
+    const allFixtures: Fixture[] = [];
+
+    if (sportId === "f1" || sportId === "all") {
+      const rows = await db.select().from(f1Fixtures).orderBy(f1Fixtures.date);
+      allFixtures.push(...rows.map(mapF1RowToFixture));
+    }
+
+    if (sportId === "football" || sportId === "all") {
+      const rows = await db
+        .select()
+        .from(footballFixtures)
+        .orderBy(footballFixtures.date, footballFixtures.kickoff);
+      allFixtures.push(...rows.map(mapRowToFixture));
+    }
+
+    allFixtures.sort((a, b) => {
+      const d = a.date.localeCompare(b.date);
+      return d !== 0 ? d : a.kickoff.localeCompare(b.kickoff);
+    });
+
+    return { fixtures: allFixtures, updatedAt };
   } catch {
     return { fixtures: [], updatedAt };
   }
