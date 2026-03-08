@@ -1,64 +1,130 @@
+import { drizzle } from "drizzle-orm/node-postgres";
 import { createSupabaseClient } from "./supabase-client";
-import { generateDummyFixtures } from "./fixtures";
+import { getPostgresPool } from "./postgres-client";
+import { footballFixtures, f1Fixtures } from "./db-schema";
 import type { Fixture } from "./fixtures";
 
-function mapRowToFixture(row: {
-  id: string;
-  home_team: string;
-  away_team: string;
-  competition: string;
-  competition_short: string;
-  kickoff: string;
-  date: string;
-  venue?: string | null;
-  status: string;
-  home_score?: number | null;
-  away_score?: number | null;
-}): Fixture {
+export type SportId = "all" | "football" | "f1";
+
+function mapF1Status(f1Status: string): Fixture["status"] {
+  if (f1Status === "scheduled") return "scheduled";
+  if (["practice", "qualifying", "race"].includes(f1Status)) return "live";
+  return "finished"; // completed, cancelled
+}
+
+function mapRowToFixture(
+  row: typeof footballFixtures.$inferSelect,
+): Fixture {
   const dateStr =
     typeof row.date === "string"
       ? row.date.split("T")[0]
       : (row.date as Date).toISOString().split("T")[0];
   return {
     id: String(row.id),
-    homeTeam: row.home_team,
-    awayTeam: row.away_team,
+    sport: "football" as const,
+    homeTeam: row.homeTeam,
+    awayTeam: row.awayTeam,
     competition: row.competition,
-    competitionShort: row.competition_short,
+    competitionShort: row.competitionShort,
     kickoff: row.kickoff,
     date: dateStr,
     venue: row.venue ?? undefined,
     status: row.status as Fixture["status"],
-    homeScore: row.home_score ?? undefined,
-    awayScore: row.away_score ?? undefined,
+    homeScore: row.homeScore ?? undefined,
+    awayScore: row.awayScore ?? undefined,
   };
 }
 
-export async function fetchFixtures(): Promise<{
+function mapF1RowToFixture(row: typeof f1Fixtures.$inferSelect): Fixture {
+  const dateStr =
+    typeof row.date === "string"
+      ? row.date.split("T")[0]
+      : (row.date as Date).toISOString().split("T")[0];
+  return {
+    id: String(row.id),
+    sport: "f1" as const,
+    homeTeam: row.circuit,
+    awayTeam: row.country,
+    competition: `Round ${row.round}`,
+    competitionShort: "F1",
+    kickoff: "14:00",
+    date: dateStr,
+    venue: row.country,
+    status: mapF1Status(row.status),
+  };
+}
+
+async function fetchFromPostgres(sportId: SportId): Promise<Fixture[]> {
+  const pool = getPostgresPool();
+  if (!pool) return [];
+
+  const db = drizzle(pool);
+  const allFixtures: Fixture[] = [];
+
+  if (sportId === "f1" || sportId === "all") {
+    const rows = await db
+      .select()
+      .from(f1Fixtures)
+      .orderBy(f1Fixtures.date);
+    allFixtures.push(...rows.map(mapF1RowToFixture));
+  }
+
+  if (sportId === "football" || sportId === "all") {
+    const rows = await db
+      .select()
+      .from(footballFixtures)
+      .orderBy(footballFixtures.date, footballFixtures.kickoff);
+    allFixtures.push(...rows.map(mapRowToFixture));
+  }
+
+  allFixtures.sort((a, b) => {
+    const d = a.date.localeCompare(b.date);
+    return d !== 0 ? d : a.kickoff.localeCompare(b.kickoff);
+  });
+
+  return allFixtures;
+}
+
+async function fetchFromSupabase(): Promise<Fixture[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("fixtures")
+    .select("*")
+    .order("date", { ascending: true })
+    .order("kickoff", { ascending: true });
+
+  if (error || !data) return [];
+  return data.map(mapRowToFixture);
+}
+
+/**
+ * Fetch fixtures from the appropriate source:
+ * - Production (`NODE_ENV === "production"`): Supabase
+ * - Development / all other envs: local Postgres (Docker)
+ */
+export async function fetchFixtures(sportId: SportId = "all"): Promise<{
   fixtures: Fixture[];
   updatedAt: string;
 }> {
-  const supabase = createSupabaseClient();
+  const updatedAt = new Date().toISOString();
 
-  if (supabase) {
+  // Production: read from Supabase
+  if (process.env.NODE_ENV === "production") {
     try {
-      const { data, error } = await supabase
-        .from("fixtures")
-        .select("*")
-        .order("date", { ascending: true })
-        .order("kickoff", { ascending: true });
-
-      if (!error && data) {
-        const fixtures = data.map(mapRowToFixture);
-        return { fixtures, updatedAt: new Date().toISOString() };
-      }
+      const fixtures = await fetchFromSupabase();
+      return { fixtures, updatedAt };
     } catch {
-      // Fall through to dummy data
+      return { fixtures: [], updatedAt };
     }
   }
 
-  return {
-    fixtures: generateDummyFixtures(),
-    updatedAt: new Date().toISOString(),
-  };
+  // Development / non-production: read from local Postgres
+  try {
+    const fixtures = await fetchFromPostgres(sportId);
+    return { fixtures, updatedAt };
+  } catch {
+    return { fixtures: [], updatedAt };
+  }
 }

@@ -42,4 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 # dev
+/local/
 /myNotes/
+docker-compose.yml
