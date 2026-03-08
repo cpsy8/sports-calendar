@@ -1,5 +1,7 @@
 "use client";
 
+import { DarkModeToggle } from "./DarkModeToggle";
+
 function formatDateHeader(d: Date) {
   return d.toLocaleDateString("en-US", {
     month: "short",
@@ -90,11 +92,13 @@ export function HeaderBar({
           </div>
         </div>
 
-        <button
+        <div className="flex items-center gap-2 shrink-0">
+          <DarkModeToggle />
+          <button
           type="button"
           onClick={onRefresh}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-medium transition-colors shrink-0"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-sm font-medium transition-colors"
           title="Refresh fixtures"
         >
           <svg
@@ -112,6 +116,7 @@ export function HeaderBar({
           </svg>
           Refresh
         </button>
+        </div>
       </div>
       {lastUpdated && (
         <p className="text-[10px] text-slate-500 dark:text-slate-400 px-4 pb-2">
