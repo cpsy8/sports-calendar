@@ -50,8 +50,14 @@ export default function Home() {
     setCenterDate(d);
   };
 
+  const centerDateStr = [
+    centerDate.getFullYear(),
+    String(centerDate.getMonth() + 1).padStart(2, "0"),
+    String(centerDate.getDate()).padStart(2, "0"),
+  ].join("-");
+
   const todayFixtures = fixtures
-    .filter((f) => f.date === centerDate.toISOString().split("T")[0])
+    .filter((f) => f.date === centerDateStr)
     .sort((a, b) => a.kickoff.localeCompare(b.kickoff));
 
   return (

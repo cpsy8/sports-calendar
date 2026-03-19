@@ -55,9 +55,17 @@ Deployed as a **static export** (`output: "export"`) to GitHub Pages.
 
 - **`app/lib/fixtures.ts`** — `Fixture` interface, `COMPETITION_COLORS` map (competition name → color key), `CARD_CLASSES` map (color key → Tailwind classes), and `generateDummyFixtures()` for offline development.
 
+### Dark mode
+
+Class-based dark mode (`dark` class on `<html>`). Tailwind v4 variant configured via `@variant dark (&:is(.dark *))` in `globals.css`.
+
+- **`app/layout.tsx`** — Inline script runs before paint to apply `dark` class from `localStorage` (or `prefers-color-scheme` fallback), preventing flash-of-wrong-theme. `<html>` has `suppressHydrationWarning`.
+- **`app/components/DarkModeToggle.tsx`** — Toggle button rendered in `HeaderBar`. Uses `useSyncExternalStore` + `MutationObserver` to watch `<html>` class — no `setState` in effects, no hydration errors. Persists preference to `localStorage`.
+
 ### UI components
 
-- **`app/components/HeaderBar.tsx`** — Sticky header with date navigation (prev/next day) and refresh button. Props: `centerDate`, `onPrev`, `onNext`, `onRefresh`, `loading`, `lastUpdated`.
+- **`app/components/HeaderBar.tsx`** — Sticky header with date navigation (prev/next day), dark mode toggle, and refresh button. Props: `centerDate`, `onPrev`, `onNext`, `onRefresh`, `loading`, `lastUpdated`.
+- **`app/components/DarkModeToggle.tsx`** — Self-contained dark/light mode toggle (moon/sun icon). Reads and writes `localStorage` key `theme` (`"dark"` | `"light"`).
 - **`app/components/SportSelector.tsx`** — Centered pill-button filter bar for "All sports", "Football", "F1".
 - **`app/components/FootballCard.tsx`** — Football fixture card (full + compact variants).
 - **`app/components/F1Card.tsx`** — F1 fixture card (full + compact variants).
