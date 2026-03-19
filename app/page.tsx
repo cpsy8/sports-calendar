@@ -1,109 +1,52 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import type { Fixture } from "./lib/fixtures";
-import { fetchFixturesClient, type SportId } from "./lib/fetch-fixtures-client";
-import { HeaderBar } from "./components/HeaderBar";
-import { SportSelector, type SportOption } from "./components/SportSelector";
-import { FootballCard } from "./components/FootballCard";
-import { F1Card } from "./components/F1Card";
+import { useState } from "react";
+import { Navbar, type SportGroup } from "./components/Navbar";
+import { CompBar, type CompId } from "./components/CompBar";
+import { TodaySection } from "./components/sections/TodaySection";
+import { PremierLeagueSection } from "./components/sections/PremierLeagueSection";
+import { UCLSection } from "./components/sections/UCLSection";
+import { LaLigaSection } from "./components/sections/LaLigaSection";
+import { SerieASection } from "./components/sections/SerieASection";
+import { BundesligaSection } from "./components/sections/BundesligaSection";
+import { F1Section } from "./components/sections/F1Section";
+import { IPLSection } from "./components/sections/IPLSection";
 
-const SPORT_OPTIONS: SportOption[] = [
-  { id: "all", label: "All sports" },
-  { id: "football", label: "Football" },
-  { id: "f1", label: "F1" },
-];
+const GROUP_DEFAULT: Partial<Record<SportGroup, CompId>> = {
+  football: "pl",
+  f1: "f1main",
+  cricket: "ipl",
+};
 
 export default function Home() {
-  const [centerDate, setCenterDate] = useState(() => new Date());
-  const [selectedSportId, setSelectedSportId] = useState<SportId>("all");
-  const [fixtures, setFixtures] = useState<Fixture[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [activeGroup, setActiveGroup] = useState<SportGroup>("today");
+  const [activeComp, setActiveComp] = useState<CompId>("pl");
 
-  const loadFixtures = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchFixturesClient(selectedSportId);
-      setFixtures(data.fixtures ?? []);
-      setLastUpdated(data.updatedAt ?? null);
-    } catch {
-      setFixtures([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedSportId]);
-
-  useEffect(() => {
-    loadFixtures();
-  }, [loadFixtures]);
-
-  const goPrev = () => {
-    const d = new Date(centerDate);
-    d.setDate(d.getDate() - 1);
-    setCenterDate(d);
-  };
-
-  const goNext = () => {
-    const d = new Date(centerDate);
-    d.setDate(d.getDate() + 1);
-    setCenterDate(d);
-  };
-
-  const centerDateStr = [
-    centerDate.getFullYear(),
-    String(centerDate.getMonth() + 1).padStart(2, "0"),
-    String(centerDate.getDate()).padStart(2, "0"),
-  ].join("-");
-
-  const todayFixtures = fixtures
-    .filter((f) => f.date === centerDateStr)
-    .sort((a, b) => a.kickoff.localeCompare(b.kickoff));
+  function handleGroupChange(group: SportGroup) {
+    setActiveGroup(group);
+    const defaultComp = GROUP_DEFAULT[group];
+    if (defaultComp) setActiveComp(defaultComp);
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <HeaderBar
-        centerDate={centerDate}
-        onPrev={goPrev}
-        onNext={goNext}
-        onRefresh={loadFixtures}
-        loading={loading}
-        lastUpdated={lastUpdated}
-      />
-
-      <SportSelector
-        sports={SPORT_OPTIONS}
-        selectedSportId={selectedSportId}
-        onChange={(id) => setSelectedSportId(id as SportId)}
-      />
-
-      <main className="p-4">
-        <div className="max-w-xl mx-auto">
-          <h2 className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-4">
-            {centerDate.toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-            })}
-          </h2>
-          <div className="space-y-3">
-            {todayFixtures.map((fixture) => (
-              <div key={fixture.id}>
-                {fixture.sport === "f1" ? (
-                  <F1Card fixture={fixture} />
-                ) : (
-                  <FootballCard fixture={fixture} />
-                )}
-              </div>
-            ))}
-            {todayFixtures.length === 0 && (
-              <p className="text-slate-500 dark:text-slate-400 py-12 text-center">
-                No matches on this date
-              </p>
-            )}
-          </div>
-        </div>
+    <div style={{ position: "relative", minHeight: "100vh" }}>
+      <div className="ambient-bg" />
+      <Navbar activeGroup={activeGroup} onGroupChange={handleGroupChange} />
+      <CompBar activeGroup={activeGroup} activeComp={activeComp} onCompChange={setActiveComp} />
+      <main className="main-content">
+        {activeGroup === "today" && <TodaySection />}
+        {activeComp === "pl" && activeGroup === "football" && <PremierLeagueSection />}
+        {activeComp === "ucl" && activeGroup === "football" && <UCLSection />}
+        {activeComp === "laliga" && activeGroup === "football" && <LaLigaSection />}
+        {activeComp === "seriea" && activeGroup === "football" && <SerieASection />}
+        {activeComp === "bundesliga" && activeGroup === "football" && <BundesligaSection />}
+        {activeComp === "f1main" && activeGroup === "f1" && <F1Section />}
+        {activeComp === "ipl" && activeGroup === "cricket" && <IPLSection />}
       </main>
+      <footer className="sp-footer">
+        <span>SportPulse © 2026</span>
+        <span>Data updated daily</span>
+      </footer>
     </div>
   );
 }
