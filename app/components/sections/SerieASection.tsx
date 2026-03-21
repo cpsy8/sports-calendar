@@ -1,3 +1,7 @@
+"use client";
+
+import { TeamLogo } from "../TeamLogo";
+
 export function SerieASection() {
   const standings = [
     { pos: 1, code: "INT", name: "Inter Milan", color: "#1d428a", p: 28, w: 21, d: 4, l: 3, gd: "+38", pts: 67 },
@@ -38,7 +42,7 @@ export function SerieASection() {
                   <td><span className="pos-num">{row.pos}</span></td>
                   <td>
                     <div className="team-cell">
-                      <div className="team-badge" style={{ background: row.color, color: row.textColor ?? "#fff" }}>{row.code}</div>
+                      <TeamLogo code={row.code} sport="football" leagueCode="seriea" color={row.color} />
                       {row.name}
                     </div>
                   </td>
@@ -62,11 +66,11 @@ export function SerieASection() {
             <div className="fixture-item" key={i}>
               <div className="fixture-teams">
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.home.color, color: f.home.textColor ?? "#fff" }}>{f.home.code}</div>
+                  <TeamLogo code={f.home.code} sport="football" leagueCode="seriea" color={f.home.color} />
                   {f.home.name}
                 </div>
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.away.color }}>{f.away.code}</div>
+                  <TeamLogo code={f.away.code} sport="football" leagueCode="seriea" color={f.away.color} />
                   {f.away.name}
                 </div>
               </div>

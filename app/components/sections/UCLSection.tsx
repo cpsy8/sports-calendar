@@ -1,3 +1,7 @@
+"use client";
+
+import { TeamLogo } from "../TeamLogo";
+
 export function UCLSection() {
   return (
     <>
@@ -46,11 +50,11 @@ export function UCLSection() {
             <div className="fixture-item" key={i}>
               <div className="fixture-teams">
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.home.color, color: f.home.textColor ?? "#fff" }}>{f.home.code}</div>
+                  <TeamLogo code={f.home.code} sport="football" leagueCode="ucl" color={f.home.color} />
                   {f.home.name}
                 </div>
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.away.color }}>{f.away.code}</div>
+                  <TeamLogo code={f.away.code} sport="football" leagueCode="ucl" color={f.away.color} />
                   {f.away.name}
                 </div>
               </div>
@@ -78,12 +82,12 @@ export function UCLSection() {
                 <div className="result-label">{r.label}</div>
                 <div className="result-row">
                   <div className="fixture-team">
-                    <div className="team-badge" style={{ background: r.home.color }}>{r.home.code}</div>
+                    <TeamLogo code={r.home.code} sport="football" leagueCode="ucl" color={r.home.color} />
                     {r.home.name}
                   </div>
                   <div className="fixture-score">{r.score}</div>
                   <div className="fixture-team">
-                    <div className="team-badge" style={{ background: r.away.color, color: r.away.textColor ?? "#fff", border: r.away.border }}>{r.away.code}</div>
+                    <TeamLogo code={r.away.code} sport="football" leagueCode="ucl" color={r.away.color} />
                     {r.away.name}
                   </div>
                 </div>

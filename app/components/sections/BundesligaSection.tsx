@@ -1,3 +1,7 @@
+"use client";
+
+import { TeamLogo } from "../TeamLogo";
+
 export function BundesligaSection() {
   const standings = [
     { pos: 1, code: "BAY", name: "Bayern Munich", color: "#dc0000", p: 26, w: 20, d: 3, l: 3, gd: "+45", pts: 63 },
@@ -38,7 +42,7 @@ export function BundesligaSection() {
                   <td><span className="pos-num">{row.pos}</span></td>
                   <td>
                     <div className="team-cell">
-                      <div className="team-badge" style={{ background: row.color, color: row.textColor ?? "#fff" }}>{row.code}</div>
+                      <TeamLogo code={row.code} sport="football" leagueCode="bundesliga" color={row.color} />
                       {row.name}
                     </div>
                   </td>
@@ -62,11 +66,11 @@ export function BundesligaSection() {
             <div className="fixture-item" key={i}>
               <div className="fixture-teams">
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.home.color }}>{f.home.code}</div>
+                  <TeamLogo code={f.home.code} sport="football" leagueCode="bundesliga" color={f.home.color} />
                   {f.home.name}
                 </div>
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.away.color, color: f.away.textColor ?? "#fff" }}>{f.away.code}</div>
+                  <TeamLogo code={f.away.code} sport="football" leagueCode="bundesliga" color={f.away.color} />
                   {f.away.name}
                 </div>
               </div>

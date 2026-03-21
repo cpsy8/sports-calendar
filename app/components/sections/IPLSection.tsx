@@ -1,3 +1,7 @@
+"use client";
+
+import { TeamLogo } from "../TeamLogo";
+
 const IPL_TABLE = [
   { pos: 1, code: "CSK", name: "Chennai Super Kings", color: "#FCCA06", textColor: "#000", p: 4, w: 3, l: 1, nrr: "+0.85", pts: 6 },
   { pos: 2, code: "MI", name: "Mumbai Indians", color: "#004BA0", p: 4, w: 3, l: 1, nrr: "+0.72", pts: 6 },
@@ -91,7 +95,7 @@ export function IPLSection() {
                   <td><span className="pos-num">{row.pos}</span></td>
                   <td>
                     <div className="team-cell">
-                      <div className="team-badge" style={{ background: row.color, color: row.textColor ?? "#fff" }}>{row.code}</div>
+                      <TeamLogo code={row.code} sport="cricket" leagueCode="ipl" color={row.color} />
                       {row.name}
                     </div>
                   </td>
@@ -116,7 +120,7 @@ export function IPLSection() {
                 <div className="scorecard-body">
                   <div className="scorecard-team">
                     <div className="scorecard-team-name">
-                      <div className="team-badge" style={{ background: sc.batting.color, color: sc.batting.textColor ?? "#fff" }}>{sc.batting.code}</div>
+                      <TeamLogo code={sc.batting.code} sport="cricket" leagueCode="ipl" color={sc.batting.color} />
                       {sc.batting.team}
                     </div>
                     <div>
@@ -126,7 +130,7 @@ export function IPLSection() {
                   </div>
                   <div className="scorecard-team">
                     <div className="scorecard-team-name">
-                      <div className="team-badge" style={{ background: sc.bowling.color, color: sc.bowling.textColor ?? "#fff" }}>{sc.bowling.code}</div>
+                      <TeamLogo code={sc.bowling.code} sport="cricket" leagueCode="ipl" color={sc.bowling.color} />
                       {sc.bowling.team}
                     </div>
                     <div>
@@ -148,11 +152,11 @@ export function IPLSection() {
               <div className="fixture-item" key={i}>
                 <div className="fixture-teams">
                   <div className="fixture-team">
-                    <div className="team-badge" style={{ background: f.home.color }}>{f.home.code}</div>
+                    <TeamLogo code={f.home.code} sport="cricket" leagueCode="ipl" color={f.home.color} />
                     {f.home.name}
                   </div>
                   <div className="fixture-team">
-                    <div className="team-badge" style={{ background: f.away.color }}>{f.away.code}</div>
+                    <TeamLogo code={f.away.code} sport="cricket" leagueCode="ipl" color={f.away.color} />
                     {f.away.name}
                   </div>
                 </div>

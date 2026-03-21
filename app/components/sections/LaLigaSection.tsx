@@ -1,3 +1,7 @@
+"use client";
+
+import { TeamLogo } from "../TeamLogo";
+
 export function LaLigaSection() {
   const standings = [
     { pos: 1, code: "BAR", name: "Barcelona", color: "#004d98", p: 28, w: 22, d: 4, l: 2, gd: "+48", pts: 70 },
@@ -38,7 +42,7 @@ export function LaLigaSection() {
                   <td><span className="pos-num">{row.pos}</span></td>
                   <td>
                     <div className="team-cell">
-                      <div className="team-badge" style={{ background: row.color, color: row.textColor ?? "#fff", border: row.border }}>{row.code}</div>
+                      <TeamLogo code={row.code} sport="football" leagueCode="laliga" color={row.color} />
                       {row.name}
                     </div>
                   </td>
@@ -62,11 +66,11 @@ export function LaLigaSection() {
             <div className="fixture-item" key={i}>
               <div className="fixture-teams">
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.home.color, color: f.home.textColor ?? "#fff", border: f.home.border }}>{f.home.code}</div>
+                  <TeamLogo code={f.home.code} sport="football" leagueCode="laliga" color={f.home.color} />
                   {f.home.name}
                 </div>
                 <div className="fixture-team">
-                  <div className="team-badge" style={{ background: f.away.color, color: f.away.textColor ?? "#fff" }}>{f.away.code}</div>
+                  <TeamLogo code={f.away.code} sport="football" leagueCode="laliga" color={f.away.color} />
                   {f.away.name}
                 </div>
               </div>
