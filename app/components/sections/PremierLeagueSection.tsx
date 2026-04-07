@@ -1,145 +1,215 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { TeamLogo } from "../TeamLogo";
+import {
+  fetchFootballStandings,
+  fetchFootballFixtures,
+  type FootballStandingRow,
+  type FootballFixtureRow,
+} from "../../lib/fetch-standings-client";
+import { teamCode, teamColor, formatFixtureDate, formatGD, todayStr } from "../../lib/team-meta";
+
+type Tab = "news" | "fixtures" | "stats" | "teams";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "news", label: "News" },
+  { id: "fixtures", label: "Fixtures" },
+  { id: "stats", label: "Stats" },
+  { id: "teams", label: "Teams" },
+];
+
+const ACCENT = "#3dffa2";
+const LEAGUE = "epl";
+
+function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
+  return (
+    <div className="fade-in fd1" style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+      {TABS.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onChange(tab.id)}
+          style={{
+            padding: "0.4rem 1.1rem",
+            borderRadius: "20px",
+            border: active === tab.id ? "none" : "1px solid var(--border-subtle)",
+            background: active === tab.id ? ACCENT : "transparent",
+            color: active === tab.id ? "#000" : "var(--text-secondary)",
+            fontWeight: active === tab.id ? 700 : 500,
+            fontSize: "0.78rem",
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Placeholder({ label }: { label: string }) {
+  return (
+    <div className="card fade-in" style={{ textAlign: "center", padding: "3rem 1.5rem", color: "var(--text-muted)" }}>
+      <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🚧</div>
+      <div style={{ fontWeight: 600 }}>{label} — Coming soon</div>
+    </div>
+  );
+}
+
+function Loading() {
+  return <div style={{ color: "var(--text-muted)", padding: "1rem 0", fontSize: "0.85rem" }}>Loading…</div>;
+}
 
 export function PremierLeagueSection() {
+  const [activeTab, setActiveTab] = useState<Tab>("fixtures");
+  const [standings, setStandings] = useState<FootballStandingRow[]>([]);
+  const [upcoming, setUpcoming] = useState<FootballFixtureRow[]>([]);
+  const [recent, setRecent] = useState<FootballFixtureRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const today = todayStr();
+    Promise.all([
+      fetchFootballStandings("Premier League"),
+      fetchFootballFixtures("EPL", "scheduled", 5, today),
+      fetchFootballFixtures("EPL", "finished", 4),
+    ]).then(([s, u, r]) => {
+      setStandings(s);
+      setUpcoming(u);
+      setRecent(r);
+      setLoading(false);
+    });
+  }, []);
+
+  const matchday = standings.length > 0 ? Math.max(...standings.map((r) => r.played)) : null;
+
   return (
     <>
       <div className="section-hero fade-in">
-        <div className="hero-bar" style={{ background: "#3dffa2" }} />
+        <div className="hero-bar" style={{ background: ACCENT }} />
         <div className="hero-icon">⚽</div>
         <div className="hero-text">
           <h2>PREMIER LEAGUE</h2>
           <p>England&apos;s top flight — 2025/26 Season</p>
         </div>
-        <div className="hero-badge" style={{ background: "#3dffa220", color: "#3dffa2" }}>
-          Matchweek 29
-        </div>
-      </div>
-
-      <div className="stat-row fade-in fd1">
-        <div className="stat-card" style={{ borderTop: "3px solid #3dffa2" }}>
-          <div className="stat-value" style={{ color: "#3dffa2" }}>29</div>
-          <div className="stat-label">Matchweek</div>
-        </div>
-        <div className="stat-card" style={{ borderTop: "3px solid var(--accent-blue)" }}>
-          <div className="stat-value" style={{ color: "var(--accent-blue)" }}>285</div>
-          <div className="stat-label">Matches Played</div>
-        </div>
-        <div className="stat-card" style={{ borderTop: "3px solid var(--accent-purple)" }}>
-          <div className="stat-value" style={{ color: "var(--accent-purple)" }}>812</div>
-          <div className="stat-label">Goals Scored</div>
-        </div>
-        <div className="stat-card" style={{ borderTop: "3px solid #f59e0b" }}>
-          <div className="stat-value" style={{ color: "#f59e0b" }}>2.85</div>
-          <div className="stat-label">Goals / Match</div>
-        </div>
-      </div>
-
-      <div className="grid-12 fade-in fd2">
-        <div className="card span-7">
-          <div className="card-header">
-            <div className="card-title">
-              Standings <span className="card-subtitle">— Top 8</span>
-            </div>
-            <button className="card-action">Full Table →</button>
+        {matchday !== null && (
+          <div className="hero-badge" style={{ background: "#3dffa220", color: ACCENT }}>
+            Matchweek {matchday}
           </div>
-          <table className="standings-table">
-            <thead>
-              <tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
-            </thead>
-            <tbody>
-              {[
-                { pos: 1, code: "LIV", name: "Liverpool", color: "#c8102e", p: 29, w: 22, d: 5, l: 2, gd: "+42", pts: 71 },
-                { pos: 2, code: "ARS", name: "Arsenal", color: "#ef0107", p: 29, w: 19, d: 6, l: 4, gd: "+35", pts: 63 },
-                { pos: 3, code: "MCI", name: "Man City", color: "#6cabdd", p: 29, w: 18, d: 5, l: 6, gd: "+30", pts: 59 },
-                { pos: 4, code: "TOT", name: "Tottenham", color: "#132257", p: 29, w: 16, d: 6, l: 7, gd: "+18", pts: 54 },
-                { pos: 5, code: "CHE", name: "Chelsea", color: "#034694", p: 29, w: 15, d: 7, l: 7, gd: "+14", pts: 52 },
-                { pos: 6, code: "AVL", name: "Aston Villa", color: "#670e36", p: 29, w: 14, d: 5, l: 10, gd: "+8", pts: 47 },
-                { pos: 7, code: "NEW", name: "Newcastle", color: "#241f20", p: 29, w: 13, d: 7, l: 9, gd: "+10", pts: 46 },
-                { pos: 8, code: "BHA", name: "Brighton", color: "#274488", p: 29, w: 12, d: 8, l: 9, gd: "+5", pts: 44 },
-              ].map((row) => (
-                <tr key={row.pos}>
-                  <td><span className="pos-num">{row.pos}</span></td>
-                  <td>
-                    <div className="team-cell">
-                      <TeamLogo code={row.code} sport="football" leagueCode="epl" color={row.color} />
-                      {row.name}
+        )}
+      </div>
+
+      <TabBar active={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "news" && <Placeholder label="News" />}
+
+      {activeTab === "fixtures" && (
+        <>
+          <div className="grid-12 fade-in fd2">
+            <div className="card span-7">
+              <div className="card-header">
+                <div className="card-title">Standings</div>
+              </div>
+              {loading ? <Loading /> : standings.length === 0 ? (
+                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No standings data yet.</div>
+              ) : (
+                <table className="standings-table">
+                  <thead>
+                    <tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
+                  </thead>
+                  <tbody>
+                    {standings.map((row) => {
+                      const code = teamCode(row.team);
+                      return (
+                        <tr key={row.position}>
+                          <td><span className="pos-num">{row.position}</span></td>
+                          <td>
+                            <div className="team-cell">
+                              <TeamLogo code={code} sport="football" leagueCode={LEAGUE} color={teamColor(code)} />
+                              {row.team}
+                            </div>
+                          </td>
+                          <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
+                          <td>{formatGD(row.goal_difference)}</td>
+                          <td className="points-cell">{row.points}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            <div className="card span-5">
+              <div className="card-header">
+                <div className="card-title">Upcoming Fixtures</div>
+              </div>
+              {loading ? <Loading /> : upcoming.length === 0 ? (
+                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No upcoming fixtures.</div>
+              ) : upcoming.map((f) => {
+                const hCode = teamCode(f.home_team);
+                const aCode = teamCode(f.away_team);
+                return (
+                  <div className="fixture-item" key={f.id}>
+                    <div className="fixture-teams">
+                      <div className="fixture-team">
+                        <TeamLogo code={hCode} sport="football" leagueCode={LEAGUE} color={teamColor(hCode)} />
+                        {f.home_team}
+                      </div>
+                      <div className="fixture-team">
+                        <TeamLogo code={aCode} sport="football" leagueCode={LEAGUE} color={teamColor(aCode)} />
+                        {f.away_team}
+                      </div>
                     </div>
-                  </td>
-                  <td>{row.p}</td><td>{row.w}</td><td>{row.d}</td><td>{row.l}</td>
-                  <td>{row.gd}</td><td className="points-cell">{row.pts}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="card span-5">
-          <div className="card-header">
-            <div className="card-title">Upcoming Fixtures</div>
-            <button className="card-action">View All →</button>
+                    <div className="fixture-meta">
+                      <div className="fixture-date">{formatFixtureDate(f.date)}</div>
+                      <div className="fixture-time">{f.kickoff}</div>
+                      {f.venue && <div className="fixture-venue">{f.venue}</div>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          {[
-            { home: { code: "LIV", name: "Liverpool", color: "#c8102e" }, away: { code: "MCI", name: "Man City", color: "#6cabdd" }, date: "SAT, 22 MAR", time: "20:00", venue: "Anfield" },
-            { home: { code: "ARS", name: "Arsenal", color: "#ef0107" }, away: { code: "CHE", name: "Chelsea", color: "#034694" }, date: "SUN, 23 MAR", time: "17:30", venue: "Emirates" },
-            { home: { code: "MUN", name: "Man United", color: "#da291c" }, away: { code: "TOT", name: "Tottenham", color: "#132257" }, date: "SUN, 23 MAR", time: "15:00", venue: "Old Trafford" },
-            { home: { code: "NEW", name: "Newcastle", color: "#241f20" }, away: { code: "AVL", name: "Aston Villa", color: "#670e36" }, date: "SAT, 29 MAR", time: "15:00", venue: "St James' Park" },
-            { home: { code: "BHA", name: "Brighton", color: "#274488" }, away: { code: "NFO", name: "Nott'm Forest", color: "#d71920" }, date: "SAT, 29 MAR", time: "15:00", venue: "AMEX" },
-          ].map((f, i) => (
-            <div className="fixture-item" key={i}>
-              <div className="fixture-teams">
-                <div className="fixture-team">
-                  <TeamLogo code={f.home.code} sport="football" leagueCode="epl" color={f.home.color} />
-                  {f.home.name}
+
+          {!loading && recent.length > 0 && (
+            <div className="grid-12 fade-in fd3" style={{ marginTop: "1.5rem" }}>
+              <div className="card span-12">
+                <div className="card-header">
+                  <div className="card-title">Recent Results</div>
                 </div>
-                <div className="fixture-team">
-                  <TeamLogo code={f.away.code} sport="football" leagueCode="epl" color={f.away.color} />
-                  {f.away.name}
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "0.8rem" }}>
+                  {recent.map((r) => {
+                    const hCode = teamCode(r.home_team);
+                    const aCode = teamCode(r.away_team);
+                    return (
+                      <div className="result-card" key={r.id}>
+                        <div className="result-label">{formatFixtureDate(r.date)}</div>
+                        <div className="result-row">
+                          <div className="fixture-team">
+                            <TeamLogo code={hCode} sport="football" leagueCode={LEAGUE} color={teamColor(hCode)} />
+                            {r.home_team}
+                          </div>
+                          <div className="fixture-score">{r.home_score} — {r.away_score}</div>
+                          <div className="fixture-team">
+                            <TeamLogo code={aCode} sport="football" leagueCode={LEAGUE} color={teamColor(aCode)} />
+                            {r.away_team}
+                          </div>
+                        </div>
+                        <div className="result-ft">FT{r.venue ? ` • ${r.venue}` : ""}</div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-              <div className="fixture-meta">
-                <div className="fixture-date">{f.date}</div>
-                <div className="fixture-time">{f.time}</div>
-                <div className="fixture-venue">{f.venue}</div>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
+          )}
+        </>
+      )}
 
-      <div className="grid-12 fade-in fd3" style={{ marginTop: "1.5rem" }}>
-        <div className="card span-12">
-          <div className="card-header">
-            <div className="card-title">Recent Results</div>
-            <button className="card-action">All Results →</button>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "0.8rem" }}>
-            {[
-              { label: "MW 28", home: { code: "LIV", name: "Liverpool", color: "#c8102e" }, score: "2 — 1", away: { code: "BHA", name: "Brighton", color: "#274488" }, venue: "Anfield" },
-              { label: "MW 28", home: { code: "ARS", name: "Arsenal", color: "#ef0107" }, score: "3 — 0", away: { code: "NFO", name: "Forest", color: "#d71920" }, venue: "Emirates" },
-              { label: "MW 28", home: { code: "MCI", name: "Man City", color: "#6cabdd" }, score: "1 — 1", away: { code: "CHE", name: "Chelsea", color: "#034694" }, venue: "Etihad" },
-              { label: "MW 28", home: { code: "TOT", name: "Spurs", color: "#132257" }, score: "4 — 1", away: { code: "SOU", name: "Southampton", color: "#e30613" }, venue: "Tottenham" },
-            ].map((r, i) => (
-              <div className="result-card" key={i}>
-                <div className="result-label">{r.label}</div>
-                <div className="result-row">
-                  <div className="fixture-team">
-                    <TeamLogo code={r.home.code} sport="football" leagueCode="epl" color={r.home.color} />
-                    {r.home.name}
-                  </div>
-                  <div className="fixture-score">{r.score}</div>
-                  <div className="fixture-team">
-                    <TeamLogo code={r.away.code} sport="football" leagueCode="epl" color={r.away.color} />
-                    {r.away.name}
-                  </div>
-                </div>
-                <div className="result-ft">FT • {r.venue}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {activeTab === "stats" && <Placeholder label="Stats" />}
+      {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );
 }

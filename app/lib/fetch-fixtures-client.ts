@@ -92,13 +92,13 @@ export async function fetchFixturesClient(sportId: SportId = "all"): Promise<{
 }> {
   const updatedAt = new Date().toISOString();
 
-  if (process.env.NODE_ENV === "production") {
-    // Static export (GitHub Pages): no API routes available, query Supabase directly.
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    // Supabase configured: query directly (works in both dev and production).
     const fixtures = await fetchFromSupabase(sportId);
     return { fixtures, updatedAt };
   }
 
-  // Local dev: delegate to the API route which reads from Docker Postgres.
+  // Fallback: local dev API route → Docker Postgres.
   const res = await fetch(`/api/fixtures/${sportId}`);
   if (!res.ok) return { fixtures: [], updatedAt };
   return res.json();
