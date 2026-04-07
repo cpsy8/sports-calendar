@@ -1,0 +1,192 @@
+import { createSupabaseClient } from "./supabase-client";
+
+export interface FootballStandingRow {
+  position: number;
+  team: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
+  points: number;
+  form: string | null;
+}
+
+export interface FootballFixtureRow {
+  id: string;
+  home_team: string;
+  away_team: string;
+  competition: string;
+  competition_short: string;
+  kickoff: string;
+  date: string;
+  venue: string | null;
+  status: string;
+  home_score: number | null;
+  away_score: number | null;
+}
+
+export interface F1DriverRow {
+  position: number;
+  driver: string;
+  team: string;
+  points: number;
+  wins: number;
+}
+
+export interface F1ConstructorRow {
+  position: number;
+  driver: string; // constructor name stored in driver column
+  points: number;
+}
+
+export interface F1RaceRow {
+  id: string;
+  season: number;
+  round: number;
+  circuit: string;
+  country: string;
+  date: string;
+  status: string;
+}
+
+export interface IPLStandingRow {
+  position: number;
+  team: string;
+  played: number;
+  won: number;
+  lost: number;
+  tied: number;
+  no_result: number;
+  points: number;
+  net_run_rate: number;
+}
+
+const FOOTBALL_TABLE_MAP: Record<string, string> = {
+  "Premier League": "premier_league_standings",
+  "La Liga": "la_liga_standings",
+  "Bundesliga": "bundesliga_standings",
+  "Serie A": "serie_a_standings",
+  "Ligue 1": "ligue_1_standings",
+  "Indian Super League": "isl_standings",
+};
+
+async function getStandingId(competition: string): Promise<string | null> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from("standings")
+    .select("id")
+    .eq("competition", competition)
+    .limit(1)
+    .maybeSingle();
+  return (data as { id: string } | null)?.id ?? null;
+}
+
+export async function fetchFootballStandings(competition: string): Promise<FootballStandingRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const tableName = FOOTBALL_TABLE_MAP[competition];
+  if (!tableName) return [];
+  const standingId = await getStandingId(competition);
+  if (!standingId) return [];
+  const { data } = await supabase
+    .from(tableName)
+    .select("position,team,played,won,drawn,lost,goals_for,goals_against,goal_difference,points,form")
+    .eq("standing_id", standingId)
+    .order("position");
+  return (data as FootballStandingRow[]) ?? [];
+}
+
+export async function fetchFootballFixtures(
+  competitionShort: string,
+  status: "scheduled" | "finished" | "live",
+  limit: number,
+  today?: string,
+): Promise<FootballFixtureRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const cols = "id,home_team,away_team,competition,competition_short,kickoff,date,venue,status,home_score,away_score";
+  if (status === "scheduled") {
+    const { data } = await supabase
+      .from("football_fixtures")
+      .select(cols)
+      .eq("competition_short", competitionShort)
+      .eq("status", "scheduled")
+      .gte("date", today ?? new Date().toISOString().split("T")[0])
+      .order("date")
+      .order("kickoff")
+      .limit(limit);
+    return (data as FootballFixtureRow[]) ?? [];
+  }
+  if (status === "finished") {
+    const { data } = await supabase
+      .from("football_fixtures")
+      .select(cols)
+      .eq("competition_short", competitionShort)
+      .eq("status", "finished")
+      .order("date", { ascending: false })
+      .limit(limit);
+    return (data as FootballFixtureRow[]) ?? [];
+  }
+  const { data } = await supabase
+    .from("football_fixtures")
+    .select(cols)
+    .eq("competition_short", competitionShort)
+    .eq("status", status)
+    .order("date")
+    .order("kickoff")
+    .limit(limit);
+  return (data as FootballFixtureRow[]) ?? [];
+}
+
+export async function fetchF1DriverStandings(): Promise<F1DriverRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const standingId = await getStandingId("F1 Drivers Championship");
+  if (!standingId) return [];
+  const { data } = await supabase
+    .from("f1_driver_standings")
+    .select("position,driver,team,points,wins")
+    .eq("standing_id", standingId)
+    .order("position");
+  return (data as F1DriverRow[]) ?? [];
+}
+
+export async function fetchF1ConstructorStandings(): Promise<F1ConstructorRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const standingId = await getStandingId("F1 Constructors Championship");
+  if (!standingId) return [];
+  const { data } = await supabase
+    .from("f1_constructor_standings")
+    .select("position,driver,points")
+    .eq("standing_id", standingId)
+    .order("position");
+  return (data as F1ConstructorRow[]) ?? [];
+}
+
+export async function fetchF1Calendar(): Promise<F1RaceRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("f1_fixtures")
+    .select("id,season,round,circuit,country,date,status")
+    .order("round");
+  return (data as F1RaceRow[]) ?? [];
+}
+
+export async function fetchIPLStandings(): Promise<IPLStandingRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const standingId = await getStandingId("Indian Premier League");
+  if (!standingId) return [];
+  const { data } = await supabase
+    .from("ipl_standings")
+    .select("position,team,played,won,lost,tied,no_result,points,net_run_rate")
+    .eq("standing_id", standingId)
+    .order("position");
+  return (data as IPLStandingRow[]) ?? [];
+}

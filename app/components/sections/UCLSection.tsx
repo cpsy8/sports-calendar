@@ -1,102 +1,171 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { TeamLogo } from "../TeamLogo";
+import {
+  fetchFootballFixtures,
+  type FootballFixtureRow,
+} from "../../lib/fetch-standings-client";
+import { teamCode, teamColor, formatFixtureDate, todayStr } from "../../lib/team-meta";
+
+type Tab = "news" | "fixtures" | "stats" | "teams";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "news", label: "News" },
+  { id: "fixtures", label: "Fixtures" },
+  { id: "stats", label: "Stats" },
+  { id: "teams", label: "Teams" },
+];
+
+const ACCENT = "#ffd700";
+
+function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
+  return (
+    <div className="fade-in fd1" style={{ display: "flex", gap: "0.5rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+      {TABS.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onChange(tab.id)}
+          style={{
+            padding: "0.4rem 1.1rem",
+            borderRadius: "20px",
+            border: active === tab.id ? "none" : "1px solid var(--border-subtle)",
+            background: active === tab.id ? ACCENT : "transparent",
+            color: active === tab.id ? "#000" : "var(--text-secondary)",
+            fontWeight: active === tab.id ? 700 : 500,
+            fontSize: "0.78rem",
+            cursor: "pointer",
+            transition: "all 0.15s",
+          }}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Placeholder({ label }: { label: string }) {
+  return (
+    <div className="card fade-in" style={{ textAlign: "center", padding: "3rem 1.5rem", color: "var(--text-muted)" }}>
+      <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🚧</div>
+      <div style={{ fontWeight: 600 }}>{label} — Coming soon</div>
+    </div>
+  );
+}
+
+function Loading() {
+  return <div style={{ color: "var(--text-muted)", padding: "1rem 0", fontSize: "0.85rem" }}>Loading…</div>;
+}
+
+function FixtureItem({ f, league }: { f: FootballFixtureRow; league: string }) {
+  const hCode = teamCode(f.home_team);
+  const aCode = teamCode(f.away_team);
+  return (
+    <div className="fixture-item">
+      <div className="fixture-teams">
+        <div className="fixture-team">
+          <TeamLogo code={hCode} sport="football" leagueCode={league} color={teamColor(hCode)} />
+          {f.home_team}
+        </div>
+        <div className="fixture-team">
+          <TeamLogo code={aCode} sport="football" leagueCode={league} color={teamColor(aCode)} />
+          {f.away_team}
+        </div>
+      </div>
+      <div className="fixture-meta">
+        <div className="fixture-date">{formatFixtureDate(f.date)}</div>
+        <div className="fixture-time">{f.kickoff}</div>
+        {f.venue && <div className="fixture-venue">{f.venue}</div>}
+      </div>
+    </div>
+  );
+}
 
 export function UCLSection() {
+  const [activeTab, setActiveTab] = useState<Tab>("fixtures");
+  const [upcoming, setUpcoming] = useState<FootballFixtureRow[]>([]);
+  const [results, setResults] = useState<FootballFixtureRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const today = todayStr();
+    Promise.all([
+      fetchFootballFixtures("UCL", "scheduled", 8, today),
+      fetchFootballFixtures("UCL", "finished", 8),
+    ]).then(([u, r]) => {
+      setUpcoming(u);
+      setResults(r);
+      setLoading(false);
+    });
+  }, []);
+
   return (
     <>
       <div className="section-hero fade-in">
-        <div className="hero-bar" style={{ background: "#ffd700" }} />
+        <div className="hero-bar" style={{ background: ACCENT }} />
         <div className="hero-icon">🏆</div>
         <div className="hero-text">
           <h2>UEFA CHAMPIONS LEAGUE</h2>
           <p>Europe&apos;s elite — 2025/26 Season</p>
         </div>
-        <div className="hero-badge" style={{ background: "#ffd70020", color: "#ffd700" }}>
-          Quarter-Finals
+        <div className="hero-badge" style={{ background: "#ffd70020", color: ACCENT }}>
+          UCL
         </div>
       </div>
 
-      <div className="stat-row fade-in fd1">
-        <div className="stat-card" style={{ borderTop: "3px solid #ffd700" }}>
-          <div className="stat-value" style={{ color: "#ffd700" }}>QF</div>
-          <div className="stat-label">Current Round</div>
-        </div>
-        <div className="stat-card" style={{ borderTop: "3px solid var(--accent-blue)" }}>
-          <div className="stat-value" style={{ color: "var(--accent-blue)" }}>8</div>
-          <div className="stat-label">Teams Left</div>
-        </div>
-        <div className="stat-card" style={{ borderTop: "3px solid var(--accent-purple)" }}>
-          <div className="stat-value" style={{ color: "var(--accent-purple)" }}>310</div>
-          <div className="stat-label">Goals So Far</div>
-        </div>
-        <div className="stat-card" style={{ borderTop: "3px solid #22c55e" }}>
-          <div className="stat-value" style={{ color: "#22c55e" }}>MAY 30</div>
-          <div className="stat-label">Final Date</div>
-        </div>
-      </div>
+      <TabBar active={activeTab} onChange={setActiveTab} />
 
-      <div className="grid-12 fade-in fd2">
-        <div className="card span-6">
-          <div className="card-header">
-            <div className="card-title">Quarter-Final Fixtures</div>
-          </div>
-          {[
-            { home: { code: "BAR", name: "Barcelona", color: "#004d98" }, away: { code: "BAY", name: "Bayern Munich", color: "#dc0000" }, date: "TUE, 8 APR", time: "21:00 CET", venue: "Camp Nou" },
-            { home: { code: "ARS", name: "Arsenal", color: "#ef0107" }, away: { code: "JUV", name: "Juventus", color: "#000" }, date: "TUE, 8 APR", time: "21:00 CET", venue: "Emirates" },
-            { home: { code: "LIV", name: "Liverpool", color: "#c8102e" }, away: { code: "INT", name: "Inter Milan", color: "#1d428a" }, date: "WED, 9 APR", time: "21:00 CET", venue: "Anfield" },
-            { home: { code: "BVB", name: "Dortmund", color: "#fde047", textColor: "#000" }, away: { code: "CHE", name: "Chelsea", color: "#034694" }, date: "WED, 9 APR", time: "21:00 CET", venue: "Signal Iduna" },
-          ].map((f, i) => (
-            <div className="fixture-item" key={i}>
-              <div className="fixture-teams">
-                <div className="fixture-team">
-                  <TeamLogo code={f.home.code} sport="football" leagueCode="ucl" color={f.home.color} />
-                  {f.home.name}
-                </div>
-                <div className="fixture-team">
-                  <TeamLogo code={f.away.code} sport="football" leagueCode="ucl" color={f.away.color} />
-                  {f.away.name}
-                </div>
-              </div>
-              <div className="fixture-meta">
-                <div className="fixture-date">{f.date}</div>
-                <div className="fixture-time">{f.time}</div>
-                <div className="fixture-venue">{f.venue}</div>
-              </div>
+      {activeTab === "news" && <Placeholder label="News" />}
+
+      {activeTab === "fixtures" && (
+        <div className="grid-12 fade-in fd2">
+          <div className="card span-6">
+            <div className="card-header">
+              <div className="card-title">Upcoming Fixtures</div>
             </div>
-          ))}
-        </div>
+            {loading ? <Loading /> : upcoming.length === 0 ? (
+              <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No upcoming fixtures.</div>
+            ) : upcoming.map((f) => <FixtureItem key={f.id} f={f} league="ucl" />)}
+          </div>
 
-        <div className="card span-6">
-          <div className="card-header">
-            <div className="card-title">Round of 16 Results</div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>
-            {[
-              { label: "R16", home: { code: "BAR", name: "Barça", color: "#004d98" }, score: "5–3", away: { code: "TOT", name: "Spurs", color: "#132257" } },
-              { label: "R16", home: { code: "ARS", name: "Arsenal", color: "#ef0107" }, score: "4–1", away: { code: "PSV", name: "PSV", color: "#e30613" } },
-              { label: "R16", home: { code: "LIV", name: "Liverpool", color: "#c8102e" }, score: "3–2", away: { code: "RMA", name: "Madrid", color: "#fff", textColor: "#000", border: "1px solid #333" } },
-              { label: "R16", home: { code: "BAY", name: "Bayern", color: "#dc0000" }, score: "6–2", away: { code: "SPO", name: "Sporting", color: "#009e60" } },
-            ].map((r, i) => (
-              <div className="result-card" key={i}>
-                <div className="result-label">{r.label}</div>
-                <div className="result-row">
-                  <div className="fixture-team">
-                    <TeamLogo code={r.home.code} sport="football" leagueCode="ucl" color={r.home.color} />
-                    {r.home.name}
-                  </div>
-                  <div className="fixture-score">{r.score}</div>
-                  <div className="fixture-team">
-                    <TeamLogo code={r.away.code} sport="football" leagueCode="ucl" color={r.away.color} />
-                    {r.away.name}
-                  </div>
-                </div>
-                <div className="result-ft">Agg</div>
+          <div className="card span-6">
+            <div className="card-header">
+              <div className="card-title">Recent Results</div>
+            </div>
+            {loading ? <Loading /> : results.length === 0 ? (
+              <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No results yet.</div>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.7rem" }}>
+                {results.map((r) => {
+                  const hCode = teamCode(r.home_team);
+                  const aCode = teamCode(r.away_team);
+                  return (
+                    <div className="result-card" key={r.id}>
+                      <div className="result-label">{formatFixtureDate(r.date)}</div>
+                      <div className="result-row">
+                        <div className="fixture-team">
+                          <TeamLogo code={hCode} sport="football" leagueCode="ucl" color={teamColor(hCode)} />
+                          {r.home_team}
+                        </div>
+                        <div className="fixture-score">{r.home_score} — {r.away_score}</div>
+                        <div className="fixture-team">
+                          <TeamLogo code={aCode} sport="football" leagueCode="ucl" color={teamColor(aCode)} />
+                          {r.away_team}
+                        </div>
+                      </div>
+                      <div className="result-ft">FT</div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            )}
           </div>
         </div>
-      </div>
+      )}
+
+      {activeTab === "stats" && <Placeholder label="Stats" />}
+      {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );
 }
