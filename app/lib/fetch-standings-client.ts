@@ -178,6 +178,31 @@ export async function fetchF1Calendar(): Promise<F1RaceRow[]> {
   return (data as F1RaceRow[]) ?? [];
 }
 
+export interface NewsArticleRow {
+  id: string;
+  sport: string;
+  competition: string | null;
+  title: string;
+  summary: string | null;
+  source: string | null;
+  source_url: string | null;
+  image_path: string | null;
+  published_at: string;
+}
+
+export async function fetchNews(competition: string, limit = 8): Promise<NewsArticleRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("news_articles")
+    .select("id,sport,competition,title,summary,source,source_url,image_path,published_at")
+    .eq("competition", competition)
+    .eq("is_active", true)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+  return (data as NewsArticleRow[]) ?? [];
+}
+
 export async function fetchIPLStandings(): Promise<IPLStandingRow[]> {
   const supabase = createSupabaseClient();
   if (!supabase) return [];

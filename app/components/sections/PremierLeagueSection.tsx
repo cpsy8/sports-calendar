@@ -9,12 +9,14 @@ import {
   type FootballFixtureRow,
 } from "../../lib/fetch-standings-client";
 import { teamCode, teamColor, formatFixtureDate, formatGD, todayStr } from "../../lib/team-meta";
+import { NewsTab } from "../NewsTab";
 
-type Tab = "news" | "fixtures" | "stats" | "teams";
+type Tab = "news" | "fixtures" | "standings" | "stats" | "teams";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "news", label: "News" },
   { id: "fixtures", label: "Fixtures" },
+  { id: "standings", label: "Standings" },
   { id: "stats", label: "Stats" },
   { id: "teams", label: "Teams" },
 ];
@@ -102,110 +104,108 @@ export function PremierLeagueSection() {
 
       <TabBar active={activeTab} onChange={setActiveTab} />
 
-      {activeTab === "news" && <Placeholder label="News" />}
+      {activeTab === "news" && <NewsTab competition="Premier League" accent={ACCENT} />}
 
       {activeTab === "fixtures" && (
-        <>
-          <div className="grid-12 fade-in fd2">
-            <div className="card span-7">
-              <div className="card-header">
-                <div className="card-title">Standings</div>
-              </div>
-              {loading ? <Loading /> : standings.length === 0 ? (
-                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No standings data yet.</div>
-              ) : (
-                <table className="standings-table">
-                  <thead>
-                    <tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
-                  </thead>
-                  <tbody>
-                    {standings.map((row) => {
-                      const code = teamCode(row.team);
-                      return (
-                        <tr key={row.position}>
-                          <td><span className="pos-num">{row.position}</span></td>
-                          <td>
-                            <div className="team-cell">
-                              <TeamLogo code={code} sport="football" leagueCode={LEAGUE} color={teamColor(code)} />
-                              {row.team}
-                            </div>
-                          </td>
-                          <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
-                          <td>{formatGD(row.goal_difference)}</td>
-                          <td className="points-cell">{row.points}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
+        <div className="grid-12 fade-in fd2">
+          <div className="card span-6">
+            <div className="card-header">
+              <div className="card-title">Upcoming Fixtures</div>
             </div>
-
-            <div className="card span-5">
-              <div className="card-header">
-                <div className="card-title">Upcoming Fixtures</div>
-              </div>
-              {loading ? <Loading /> : upcoming.length === 0 ? (
-                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No upcoming fixtures.</div>
-              ) : upcoming.map((f) => {
-                const hCode = teamCode(f.home_team);
-                const aCode = teamCode(f.away_team);
-                return (
-                  <div className="fixture-item" key={f.id}>
-                    <div className="fixture-teams">
-                      <div className="fixture-team">
-                        <TeamLogo code={hCode} sport="football" leagueCode={LEAGUE} color={teamColor(hCode)} />
-                        {f.home_team}
-                      </div>
-                      <div className="fixture-team">
-                        <TeamLogo code={aCode} sport="football" leagueCode={LEAGUE} color={teamColor(aCode)} />
-                        {f.away_team}
-                      </div>
+            {loading ? <Loading /> : upcoming.length === 0 ? (
+              <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No upcoming fixtures.</div>
+            ) : upcoming.map((f) => {
+              const hCode = teamCode(f.home_team);
+              const aCode = teamCode(f.away_team);
+              return (
+                <div className="fixture-item" key={f.id}>
+                  <div className="fixture-teams">
+                    <div className="fixture-team">
+                      <TeamLogo code={hCode} sport="football" leagueCode={LEAGUE} color={teamColor(hCode)} />
+                      {f.home_team}
                     </div>
-                    <div className="fixture-meta">
-                      <div className="fixture-date">{formatFixtureDate(f.date)}</div>
-                      <div className="fixture-time">{f.kickoff}</div>
-                      {f.venue && <div className="fixture-venue">{f.venue}</div>}
+                    <div className="fixture-team">
+                      <TeamLogo code={aCode} sport="football" leagueCode={LEAGUE} color={teamColor(aCode)} />
+                      {f.away_team}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="fixture-meta">
+                    <div className="fixture-date">{formatFixtureDate(f.date)}</div>
+                    <div className="fixture-time">{f.kickoff}</div>
+                    {f.venue && <div className="fixture-venue">{f.venue}</div>}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {!loading && recent.length > 0 && (
-            <div className="grid-12 fade-in fd3" style={{ marginTop: "1.5rem" }}>
-              <div className="card span-12">
-                <div className="card-header">
-                  <div className="card-title">Recent Results</div>
+          <div className="card span-6">
+            <div className="card-header">
+              <div className="card-title">Recent Results</div>
+            </div>
+            {loading ? <Loading /> : recent.length === 0 ? (
+              <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No results yet.</div>
+            ) : recent.map((r) => {
+              const hCode = teamCode(r.home_team);
+              const aCode = teamCode(r.away_team);
+              return (
+                <div className="result-card" key={r.id}>
+                  <div className="result-label">{formatFixtureDate(r.date)}</div>
+                  <div className="result-row">
+                    <div className="fixture-team">
+                      <TeamLogo code={hCode} sport="football" leagueCode={LEAGUE} color={teamColor(hCode)} />
+                      {r.home_team}
+                    </div>
+                    <div className="fixture-score">{r.home_score} — {r.away_score}</div>
+                    <div className="fixture-team">
+                      <TeamLogo code={aCode} sport="football" leagueCode={LEAGUE} color={teamColor(aCode)} />
+                      {r.away_team}
+                    </div>
+                  </div>
+                  <div className="result-ft">FT{r.venue ? ` • ${r.venue}` : ""}</div>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "0.8rem" }}>
-                  {recent.map((r) => {
-                    const hCode = teamCode(r.home_team);
-                    const aCode = teamCode(r.away_team);
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {activeTab === "standings" && (
+        <div className="grid-12 fade-in fd2">
+          <div className="card span-12">
+            <div className="card-header">
+              <div className="card-title">Standings</div>
+            </div>
+            {loading ? <Loading /> : standings.length === 0 ? (
+              <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No standings data yet.</div>
+            ) : (
+              <table className="standings-table">
+                <thead>
+                  <tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
+                </thead>
+                <tbody>
+                  {standings.map((row) => {
+                    const code = teamCode(row.team);
                     return (
-                      <div className="result-card" key={r.id}>
-                        <div className="result-label">{formatFixtureDate(r.date)}</div>
-                        <div className="result-row">
-                          <div className="fixture-team">
-                            <TeamLogo code={hCode} sport="football" leagueCode={LEAGUE} color={teamColor(hCode)} />
-                            {r.home_team}
+                      <tr key={row.position}>
+                        <td><span className="pos-num">{row.position}</span></td>
+                        <td>
+                          <div className="team-cell">
+                            <TeamLogo code={code} sport="football" leagueCode={LEAGUE} color={teamColor(code)} />
+                            {row.team}
                           </div>
-                          <div className="fixture-score">{r.home_score} — {r.away_score}</div>
-                          <div className="fixture-team">
-                            <TeamLogo code={aCode} sport="football" leagueCode={LEAGUE} color={teamColor(aCode)} />
-                            {r.away_team}
-                          </div>
-                        </div>
-                        <div className="result-ft">FT{r.venue ? ` • ${r.venue}` : ""}</div>
-                      </div>
+                        </td>
+                        <td>{row.played}</td><td>{row.won}</td><td>{row.drawn}</td><td>{row.lost}</td>
+                        <td>{formatGD(row.goal_difference)}</td>
+                        <td className="points-cell">{row.points}</td>
+                      </tr>
                     );
                   })}
-                </div>
-              </div>
-            </div>
-          )}
-        </>
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
       )}
 
       {activeTab === "stats" && <Placeholder label="Stats" />}

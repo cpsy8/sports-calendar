@@ -10,6 +10,7 @@ import {
   type F1RaceRow,
 } from "../../lib/fetch-standings-client";
 import { F1_TEAM_COLORS, todayStr } from "../../lib/team-meta";
+import { NewsTab } from "../NewsTab";
 
 type Tab = "news" | "schedule" | "teams" | "drivers";
 
@@ -141,7 +142,7 @@ export function F1Section() {
 
       <TabBar active={activeTab} onChange={setActiveTab} />
 
-      {activeTab === "news" && <Placeholder label="News" />}
+      {activeTab === "news" && <NewsTab competition="Formula 1" accent={ACCENT} />}
 
       {activeTab === "drivers" && (
         <div className="grid-12 fade-in fd2">
