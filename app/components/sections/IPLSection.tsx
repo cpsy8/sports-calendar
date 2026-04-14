@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { TeamLogo } from "../TeamLogo";
 import { fetchIPLStandings, type IPLStandingRow } from "../../lib/fetch-standings-client";
 import { teamCode, teamColor } from "../../lib/team-meta";
+import { NewsTab } from "../NewsTab";
 
 type Tab = "news" | "fixtures" | "stats" | "teams";
 
@@ -83,7 +84,7 @@ export function IPLSection() {
 
       <TabBar active={activeTab} onChange={setActiveTab} />
 
-      {activeTab === "news" && <Placeholder label="News" />}
+      {activeTab === "news" && <NewsTab competition="Indian Premier League" accent={ACCENT} />}
 
       {activeTab === "fixtures" && (
         <div className="grid-12 fade-in fd2">

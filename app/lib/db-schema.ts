@@ -40,6 +40,20 @@ export const sportImages = pgTable("sport_images", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+export const newsArticles = pgTable("news_articles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  sport: text("sport").notNull(),
+  competition: text("competition"),
+  title: text("title").notNull(),
+  summary: text("summary"),
+  source: text("source"),
+  sourceUrl: text("source_url"),
+  imagePath: text("image_path"),
+  publishedAt: timestamp("published_at", { withTimezone: true }).notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
 export const siteContent = pgTable("site_content", {
   id: uuid("id").primaryKey().defaultRandom(),
   slot: text("slot").notNull().unique(),
