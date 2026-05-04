@@ -1,0 +1,5 @@
+# Supabase project config — only Edge Functions are managed here.
+# Set project_id via `supabase link` so deploys target the right ref.
+
+[functions.trigger-data-update]
+verify_jwt = false
