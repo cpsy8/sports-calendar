@@ -1,6 +1,7 @@
 "use client";
 
 import { DarkModeToggle } from "./DarkModeToggle";
+import { DataFreshnessBadge } from "./DataFreshnessBadge";
 
 function formatDateHeader(d: Date) {
   return d.toLocaleDateString("en-US", {
@@ -93,6 +94,7 @@ export function HeaderBar({
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          <DataFreshnessBadge sport="all" />
           <DarkModeToggle />
           <button
           type="button"

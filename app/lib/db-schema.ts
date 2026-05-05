@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, uuid, integer, date, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, uuid, integer, date, timestamp, numeric } from "drizzle-orm/pg-core";
 
 export const footballFixtures = pgTable("football_fixtures", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -23,6 +23,23 @@ export const f1Fixtures = pgTable("f1_fixtures", {
   country: text("country").notNull(),
   date: date("date").notNull(),
   status: text("status").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const f1RaceResults = pgTable("f1_race_results", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  fixtureId: uuid("fixture_id"),
+  season: text("season").notNull(),
+  round: integer("round").notNull(),
+  position: integer("position"),
+  driver: text("driver").notNull(),
+  constructor: text("constructor").notNull(),
+  grid: integer("grid"),
+  laps: integer("laps").notNull(),
+  statusText: text("status_text").notNull(),
+  points: numeric("points").notNull(),
+  isFastestLap: boolean("is_fastest_lap").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });

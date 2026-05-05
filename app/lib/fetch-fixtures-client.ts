@@ -86,6 +86,38 @@ async function fetchFromSupabase(sportId: SportId): Promise<Fixture[]> {
   return allFixtures;
 }
 
+/**
+ * Returns the most recent updated_at timestamp across the data tables for the
+ * given sport. Used by the data-freshness badge in the header.
+ */
+export async function fetchLastUpdated(sportId: SportId = "all"): Promise<string | null> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return null;
+
+  const tables: string[] = [];
+  if (sportId === "f1" || sportId === "all") {
+    tables.push("f1_fixtures", "f1_driver_standings", "f1_race_results");
+  }
+  if (sportId === "football" || sportId === "all") {
+    tables.push("football_fixtures");
+  }
+
+  const stamps = await Promise.all(
+    tables.map(async (t) => {
+      const { data } = await supabase
+        .from(t)
+        .select("updated_at")
+        .order("updated_at", { ascending: false })
+        .limit(1);
+      return data?.[0]?.updated_at as string | undefined;
+    }),
+  );
+  const valid = stamps.filter((s): s is string => Boolean(s));
+  if (valid.length === 0) return null;
+  valid.sort((a, b) => b.localeCompare(a));
+  return valid[0];
+}
+
 export async function fetchFixturesClient(sportId: SportId = "all"): Promise<{
   fixtures: Fixture[];
   updatedAt: string;
