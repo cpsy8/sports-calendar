@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TeamLogo } from "../TeamLogo";
+import { competitionLogoUrl } from "../../lib/image-utils";
 import {
   fetchWcGroupStandings,
   fetchWcFixturesByStage,
@@ -267,7 +268,7 @@ export function WorldCup2026Section() {
     <>
       <div className="section-hero fade-in">
         <div className="hero-bar" style={{ background: ACCENT }} />
-        <div className="hero-icon">🏆</div>
+        <div className="hero-icon"><img src={competitionLogoUrl("WC26") ?? ""} alt="World Cup 2026" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
         <div className="hero-text">
           <h2>FIFA WORLD CUP 2026</h2>
           <p>USA · Canada · Mexico — 11 Jun – 19 Jul 2026 · 48 teams · 104 matches</p>

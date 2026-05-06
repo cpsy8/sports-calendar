@@ -5,10 +5,15 @@ import type { NextConfig } from "next";
 // keep API routes working for dev.
 const isCI = process.env.GITHUB_ACTIONS === "true";
 
+const basePath = isCI ? "/sports-calendar" : "";
+
 const nextConfig: NextConfig = {
   ...(isCI ? { output: "export" } : {}),
-  basePath: isCI ? "/sports-calendar" : "",
+  basePath,
   assetPrefix: isCI ? "/sports-calendar/" : "",
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+  },
 };
 
 export default nextConfig;
