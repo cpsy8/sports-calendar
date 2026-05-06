@@ -9,6 +9,7 @@ import { UCLSection } from "./components/sections/UCLSection";
 import { LaLigaSection } from "./components/sections/LaLigaSection";
 import { SerieASection } from "./components/sections/SerieASection";
 import { BundesligaSection } from "./components/sections/BundesligaSection";
+import { WorldCup2026Section } from "./components/sections/WorldCup2026Section";
 import { F1Section } from "./components/sections/F1Section";
 import { IPLSection } from "./components/sections/IPLSection";
 
@@ -40,6 +41,7 @@ export default function Home() {
         {activeComp === "laliga" && activeGroup === "football" && <LaLigaSection />}
         {activeComp === "seriea" && activeGroup === "football" && <SerieASection />}
         {activeComp === "bundesliga" && activeGroup === "football" && <BundesligaSection />}
+        {activeComp === "wc2026" && activeGroup === "football" && <WorldCup2026Section />}
         {activeComp === "f1main" && activeGroup === "f1" && <F1Section />}
         {activeComp === "ipl" && activeGroup === "cricket" && <IPLSection />}
       </main>
