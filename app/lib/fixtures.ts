@@ -22,6 +22,7 @@ export const COMPETITION_COLORS: Record<string, string> = {
   "UEFA Champions League": "emerald",
   "Eredivisie": "orange",
   "F1": "red",
+  "FIFA World Cup 2026": "sky",
 };
 
 export const CARD_CLASSES: Record<string, string> = {

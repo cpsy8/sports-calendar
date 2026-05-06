@@ -26,6 +26,22 @@ export interface FootballFixtureRow {
   status: string;
   home_score: number | null;
   away_score: number | null;
+  stage?: string | null;
+  group_name?: string | null;
+}
+
+export interface WcGroupStandingRow {
+  position: number;
+  team: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  goals_for: number;
+  goals_against: number;
+  goal_difference: number;
+  points: number;
+  group_name: string;
 }
 
 export interface F1DriverRow {
@@ -178,6 +194,29 @@ export async function fetchF1Calendar(): Promise<F1RaceRow[]> {
   return (data as F1RaceRow[]) ?? [];
 }
 
+export interface F1RaceResultRow {
+  position: number | null;
+  driver: string;
+  constructor: string;
+  grid: number | null;
+  laps: number;
+  status_text: string;
+  points: number;
+  is_fastest_lap: boolean;
+}
+
+export async function fetchF1RaceResults(season: string, round: number): Promise<F1RaceResultRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("f1_race_results")
+    .select("position,driver,constructor,grid,laps,status_text,points,is_fastest_lap")
+    .eq("season", season)
+    .eq("round", round)
+    .order("position", { ascending: true });
+  return (data as F1RaceResultRow[]) ?? [];
+}
+
 export interface NewsArticleRow {
   id: string;
   sport: string;
@@ -201,6 +240,48 @@ export async function fetchNews(competition: string, limit = 8): Promise<NewsArt
     .order("published_at", { ascending: false })
     .limit(limit);
   return (data as NewsArticleRow[]) ?? [];
+}
+
+export async function fetchWcGroupStandings(
+  competitionShort = "WC2026",
+): Promise<Record<string, WcGroupStandingRow[]>> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return {};
+  const { data } = await supabase
+    .from("wc_group_standings")
+    .select(
+      "position,team,played,won,drawn,lost,goals_for,goals_against,goal_difference,points,group_name",
+    )
+    .eq("competition_short", competitionShort)
+    .order("group_name")
+    .order("position");
+  const rows = (data as WcGroupStandingRow[]) ?? [];
+  const grouped: Record<string, WcGroupStandingRow[]> = {};
+  for (const r of rows) {
+    if (!grouped[r.group_name]) grouped[r.group_name] = [];
+    grouped[r.group_name].push(r);
+  }
+  return grouped;
+}
+
+export async function fetchWcFixturesByStage(
+  stage: string | null,
+  limit = 200,
+): Promise<FootballFixtureRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const cols =
+    "id,home_team,away_team,competition,competition_short,kickoff,date,venue,status,home_score,away_score,stage,group_name";
+  let query = supabase
+    .from("football_fixtures")
+    .select(cols)
+    .eq("competition_short", "WC2026")
+    .order("date")
+    .order("kickoff")
+    .limit(limit);
+  if (stage) query = query.eq("stage", stage);
+  const { data } = await query;
+  return (data as FootballFixtureRow[]) ?? [];
 }
 
 export async function fetchIPLStandings(): Promise<IPLStandingRow[]> {
