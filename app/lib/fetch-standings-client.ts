@@ -50,6 +50,7 @@ export interface F1RaceRow {
   country: string;
   date: string;
   status: string;
+  has_sprint: boolean;
 }
 
 export interface IPLStandingRow {
@@ -173,9 +174,54 @@ export async function fetchF1Calendar(): Promise<F1RaceRow[]> {
   if (!supabase) return [];
   const { data } = await supabase
     .from("f1_fixtures")
-    .select("id,season,round,circuit,country,date,status")
+    .select("id,season,round,circuit,country,date,status,has_sprint")
     .order("round");
   return (data as F1RaceRow[]) ?? [];
+}
+
+export interface F1RaceResultRow {
+  position: number | null;
+  driver: string;
+  constructor: string;
+  grid: number | null;
+  laps: number;
+  status_text: string;
+  points: number;
+  is_fastest_lap: boolean;
+}
+
+export async function fetchF1RaceResults(season: string, round: number): Promise<F1RaceResultRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("f1_race_results")
+    .select("position,driver,constructor,grid,laps,status_text,points,is_fastest_lap")
+    .eq("season", season)
+    .eq("round", round)
+    .order("position", { ascending: true });
+  return (data as F1RaceResultRow[]) ?? [];
+}
+
+export interface F1SprintResultRow {
+  position: number | null;
+  driver: string;
+  constructor: string;
+  grid: number | null;
+  laps: number;
+  status_text: string;
+  points: number;
+}
+
+export async function fetchF1SprintResults(season: string, round: number): Promise<F1SprintResultRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("f1_sprint_results")
+    .select("position,driver,constructor,grid,laps,status_text,points")
+    .eq("season", season)
+    .eq("round", round)
+    .order("position", { ascending: true });
+  return (data as F1SprintResultRow[]) ?? [];
 }
 
 export interface F1RaceResultRow {

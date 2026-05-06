@@ -6,15 +6,18 @@ import {
   fetchF1ConstructorStandings,
   fetchF1Calendar,
   fetchF1RaceResults,
+  fetchF1SprintResults,
   type F1DriverRow,
   type F1ConstructorRow,
   type F1RaceRow,
   type F1RaceResultRow,
+  type F1SprintResultRow,
 } from "../../lib/fetch-standings-client";
 import { F1_TEAM_COLORS, todayStr } from "../../lib/team-meta";
 import { NewsTab } from "../NewsTab";
 
 type Tab = "news" | "schedule" | "teams" | "drivers";
+type ResultTab = "race" | "sprint";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "news", label: "News" },
@@ -24,6 +27,7 @@ const TABS: { id: Tab; label: string }[] = [
 ];
 
 const ACCENT = "#e10600";
+const SPRINT_COLOR = "#f59e0b";
 
 const COUNTRY_FLAGS: Record<string, string> = {
   Australia: "🇦🇺", China: "🇨🇳", Japan: "🇯🇵", Bahrain: "🇧🇭",
@@ -98,7 +102,7 @@ function Breadcrumb({ race, onBack }: { race: F1RaceRow; onBack: () => void }) {
           alignItems: "center",
           gap: "0.3rem",
           background: "none",
-          border: `1px solid var(--border-subtle)`,
+          border: "1px solid var(--border-subtle)",
           borderRadius: "6px",
           padding: "0.25rem 0.6rem",
           cursor: "pointer",
@@ -118,6 +122,55 @@ function Breadcrumb({ race, onBack }: { race: F1RaceRow; onBack: () => void }) {
   );
 }
 
+function ResultsTable({
+  rows,
+  showFastestLap,
+}: {
+  rows: (F1RaceResultRow | F1SprintResultRow)[];
+  showFastestLap: boolean;
+}) {
+  return (
+    <table className="standings-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Driver</th>
+          <th>Team</th>
+          <th>Grid</th>
+          <th>Laps</th>
+          <th>Status</th>
+          <th>Pts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => {
+          const color = F1_TEAM_COLORS[r.constructor] ?? "#888";
+          const isFastest = showFastestLap && "is_fastest_lap" in r && r.is_fastest_lap;
+          return (
+            <tr key={i}>
+              <td><span className="pos-num">{r.position ?? "—"}</span></td>
+              <td>
+                <div className="team-cell">
+                  <div className="driver-team-line" style={{ background: color }} />
+                  {r.driver}
+                  {isFastest && (
+                    <span style={{ marginLeft: "0.4rem", color: "#a855f7", fontSize: "0.7rem", fontWeight: 700 }}>⚡FL</span>
+                  )}
+                </div>
+              </td>
+              <td style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>{r.constructor}</td>
+              <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.grid ?? "—"}</td>
+              <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.laps}</td>
+              <td style={{ color: r.status_text === "Finished" ? "var(--text-secondary)" : "#f87171", fontSize: "0.8rem" }}>{r.status_text}</td>
+              <td className="points-cell">{Number(r.points)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
 export function F1Section() {
   const [activeTab, setActiveTab] = useState<Tab>("drivers");
   const [drivers, setDrivers] = useState<F1DriverRow[]>([]);
@@ -126,7 +179,9 @@ export function F1Section() {
   const [loading, setLoading] = useState(true);
   const [selectedRound, setSelectedRound] = useState<F1RaceRow | null>(null);
   const [raceResults, setRaceResults] = useState<F1RaceResultRow[]>([]);
+  const [sprintResults, setSprintResults] = useState<F1SprintResultRow[]>([]);
   const [resultsLoading, setResultsLoading] = useState(false);
+  const [activeResultTab, setActiveResultTab] = useState<ResultTab>("race");
 
   useEffect(() => {
     Promise.all([
@@ -145,9 +200,16 @@ export function F1Section() {
     if (race.status !== "completed") return;
     setSelectedRound(race);
     setRaceResults([]);
+    setSprintResults([]);
+    setActiveResultTab("race");
     setResultsLoading(true);
-    fetchF1RaceResults(String(race.season), race.round).then((results) => {
-      setRaceResults([...results].sort((a, b) => (a.position ?? 99) - (b.position ?? 99)));
+    const fetches: [Promise<F1RaceResultRow[]>, Promise<F1SprintResultRow[]>] = [
+      fetchF1RaceResults(String(race.season), race.round),
+      race.has_sprint ? fetchF1SprintResults(String(race.season), race.round) : Promise.resolve([]),
+    ];
+    Promise.all(fetches).then(([race_r, sprint_r]) => {
+      setRaceResults([...race_r].sort((a, b) => (a.position ?? 99) - (b.position ?? 99)));
+      setSprintResults([...sprint_r].sort((a, b) => (a.position ?? 99) - (b.position ?? 99)));
       setResultsLoading(false);
     });
   }
@@ -155,9 +217,9 @@ export function F1Section() {
   function handleBack() {
     setSelectedRound(null);
     setRaceResults([]);
+    setSprintResults([]);
   }
 
-  // When user switches away from schedule tab, clear selected round
   function handleTabChange(tab: Tab) {
     if (tab !== "schedule") setSelectedRound(null);
     setActiveTab(tab);
@@ -279,15 +341,27 @@ export function F1Section() {
                       className="race-item"
                       key={r.round}
                       onClick={() => handleRoundClick(r)}
-                      style={{
-                        cursor: isCompleted ? "pointer" : "default",
-                        transition: "background 0.15s",
-                      }}
+                      style={{ cursor: isCompleted ? "pointer" : "default", transition: "background 0.15s" }}
                     >
                       <div className="race-round">R{r.round}</div>
                       <div className="race-flag">{flag}</div>
                       <div className="race-info">
-                        <div className="race-name">{r.country} Grand Prix</div>
+                        <div className="race-name" style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                          {r.country} Grand Prix
+                          {r.has_sprint && (
+                            <span style={{
+                              fontSize: "0.62rem",
+                              fontWeight: 700,
+                              background: `${SPRINT_COLOR}25`,
+                              color: SPRINT_COLOR,
+                              borderRadius: "4px",
+                              padding: "0 0.3rem",
+                              lineHeight: "1.6",
+                            }}>
+                              SPRINT
+                            </span>
+                          )}
+                        </div>
                         <div className="race-circuit">{r.circuit}</div>
                       </div>
                       <div>
@@ -312,51 +386,68 @@ export function F1Section() {
           </div>
           <div className="card span-12">
             <div className="card-header">
-              <div className="card-title">Race Results — {selectedRound.country} Grand Prix</div>
-              <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
-                Round {selectedRound.round} · {formatRaceDate(selectedRound.date)} · {selectedRound.circuit}
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                <div className="card-title" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  {selectedRound.country} Grand Prix
+                  {selectedRound.has_sprint && (
+                    <span style={{
+                      fontSize: "0.65rem",
+                      fontWeight: 700,
+                      background: `${SPRINT_COLOR}25`,
+                      color: SPRINT_COLOR,
+                      borderRadius: "4px",
+                      padding: "0 0.35rem",
+                      lineHeight: "1.6",
+                    }}>
+                      SPRINT WEEKEND
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                  Round {selectedRound.round} · {formatRaceDate(selectedRound.date)} · {selectedRound.circuit}
+                </div>
               </div>
             </div>
-            {resultsLoading ? <Loading /> : raceResults.length === 0 ? (
-              <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No results available yet.</div>
-            ) : (
-              <table className="standings-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Driver</th>
-                    <th>Team</th>
-                    <th>Grid</th>
-                    <th>Laps</th>
-                    <th>Status</th>
-                    <th>Pts</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {raceResults.map((r, i) => {
-                    const color = F1_TEAM_COLORS[r.constructor] ?? "#888";
-                    return (
-                      <tr key={i}>
-                        <td><span className="pos-num">{r.position ?? "—"}</span></td>
-                        <td>
-                          <div className="team-cell">
-                            <div className="driver-team-line" style={{ background: color }} />
-                            {r.driver}
-                            {r.is_fastest_lap && (
-                              <span style={{ marginLeft: "0.4rem", color: "#a855f7", fontSize: "0.7rem", fontWeight: 700 }}>⚡FL</span>
-                            )}
-                          </div>
-                        </td>
-                        <td style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>{r.constructor}</td>
-                        <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.grid ?? "—"}</td>
-                        <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.laps}</td>
-                        <td style={{ color: r.status_text === "Finished" ? "var(--text-secondary)" : "#f87171", fontSize: "0.8rem" }}>{r.status_text}</td>
-                        <td className="points-cell">{Number(r.points)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+
+            {selectedRound.has_sprint && (
+              <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+                {(["race", "sprint"] as ResultTab[]).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setActiveResultTab(t)}
+                    style={{
+                      padding: "0.3rem 0.9rem",
+                      borderRadius: "20px",
+                      border: activeResultTab === t ? "none" : "1px solid var(--border-subtle)",
+                      background: activeResultTab === t
+                        ? (t === "sprint" ? SPRINT_COLOR : ACCENT)
+                        : "transparent",
+                      color: activeResultTab === t ? "#fff" : "var(--text-secondary)",
+                      fontWeight: activeResultTab === t ? 700 : 500,
+                      fontSize: "0.75rem",
+                      cursor: "pointer",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    {t === "race" ? "Race" : "Sprint"}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {resultsLoading ? <Loading /> : (
+              <>
+                {activeResultTab === "race" && (
+                  raceResults.length === 0
+                    ? <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No race results available yet.</div>
+                    : <ResultsTable rows={raceResults} showFastestLap={true} />
+                )}
+                {activeResultTab === "sprint" && (
+                  sprintResults.length === 0
+                    ? <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No sprint results available yet.</div>
+                    : <ResultsTable rows={sprintResults} showFastestLap={false} />
+                )}
+              </>
             )}
           </div>
         </div>
