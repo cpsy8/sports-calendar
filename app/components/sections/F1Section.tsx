@@ -377,62 +377,6 @@ export function F1Section() {
             )}
           </div>
 
-          {selectedRound && (
-            <div className="card span-12 fade-in" style={{ marginTop: "1rem" }}>
-              <div className="card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div className="card-title">
-                  {COUNTRY_FLAGS[selectedRound.country] ?? "🏁"} R{selectedRound.round} — {selectedRound.country} Grand Prix Results
-                </div>
-                <button
-                  onClick={() => { setSelectedRound(null); setRaceResults([]); }}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "1.1rem" }}
-                >
-                  ✕
-                </button>
-              </div>
-              {resultsLoading ? <Loading /> : raceResults.length === 0 ? (
-                <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No results available yet.</div>
-              ) : (
-                <table className="standings-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Driver</th>
-                      <th>Team</th>
-                      <th>Grid</th>
-                      <th>Laps</th>
-                      <th>Status</th>
-                      <th>Pts</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {raceResults.map((r, i) => {
-                      const color = F1_TEAM_COLORS[r.constructor] ?? "#888";
-                      return (
-                        <tr key={i}>
-                          <td><span className="pos-num">{r.position ?? "—"}</span></td>
-                          <td>
-                            <div className="team-cell">
-                              <div className="driver-team-line" style={{ background: color }} />
-                              {r.driver}
-                              {r.is_fastest_lap && (
-                                <span style={{ marginLeft: "0.4rem", color: "#a855f7", fontSize: "0.7rem", fontWeight: 700 }}>⚡FL</span>
-                              )}
-                            </div>
-                          </td>
-                          <td style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>{r.constructor}</td>
-                          <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.grid ?? "—"}</td>
-                          <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.laps}</td>
-                          <td style={{ color: r.status_text === "Finished" ? "var(--text-secondary)" : "#f87171", fontSize: "0.8rem" }}>{r.status_text}</td>
-                          <td className="points-cell">{Number(r.points)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
         </div>
       )}
 
