@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TeamLogo } from "../TeamLogo";
+import { competitionLogoUrl } from "../../lib/image-utils";
 import {
   fetchFootballFixtures,
   type FootballFixtureRow,
@@ -105,7 +106,7 @@ export function UCLSection() {
     <>
       <div className="section-hero fade-in">
         <div className="hero-bar" style={{ background: ACCENT }} />
-        <div className="hero-icon">🏆</div>
+        <div className="hero-icon"><img src={competitionLogoUrl("UCL") ?? ""} alt="UCL" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
         <div className="hero-text">
           <h2>UEFA CHAMPIONS LEAGUE</h2>
           <p>Europe&apos;s elite — 2025/26 Season</p>

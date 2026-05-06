@@ -1,29 +1,27 @@
 /**
- * Deterministic URL builders for Supabase Storage images.
+ * Deterministic URL builders for logo assets.
  *
- * Image URLs are constructed from entity codes — no database query needed.
- * If the image doesn't exist at the expected path, the `<TeamLogo>` component
- * handles the 404 gracefully with a fallback.
+ * Logos are static files served from /public/logos/. GitHub Pages (Fastly CDN)
+ * caches them — no separate CDN or DB query needed. Missing files return a
+ * deterministic 404 that <TeamLogo> handles via onError fallback.
+ *
+ * basePath note: assetPrefix only auto-prefixes Next-managed assets (CSS/JS).
+ * Raw <img src="..."> needs manual prefix, so we read NEXT_PUBLIC_BASE_PATH.
  */
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const BUCKET = "sport-assets";
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-/**
- * Build the public Supabase Storage URL for a given storage path.
- */
-export function getStorageUrl(path: string): string | null {
-  if (!SUPABASE_URL) return null;
-  return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}`;
+function logoPath(rel: string): string {
+  return `${BASE_PATH}/logos/${rel}`;
 }
 
 /**
  * Get the logo URL for a team by sport, code, and optional league code.
  *
  * Examples:
- *   teamLogoUrl("football", "ARS", "epl")  → .../team-logos/football/epl/ARS.png
- *   teamLogoUrl("f1", "MCL")               → .../team-logos/f1/MCL.png
- *   teamLogoUrl("cricket", "CSK", "ipl")   → .../team-logos/cricket/ipl/CSK.png
+ *   teamLogoUrl("football", "ARS", "epl")  → /logos/teams/epl/ARS.png
+ *   teamLogoUrl("f1", "MCL")               → /logos/teams/f1/MCL.png
+ *   teamLogoUrl("cricket", "CSK", "ipl")   → /logos/teams/cricket/ipl/CSK.png
  */
 export function teamLogoUrl(
   sport: "football" | "f1" | "cricket",
@@ -31,13 +29,13 @@ export function teamLogoUrl(
   leagueCode?: string
 ): string | null {
   if (sport === "football" && leagueCode) {
-    return getStorageUrl(`team-logos/football/${leagueCode}/${code}.png`);
+    return logoPath(`teams/${leagueCode}/${code}.png`);
   }
   if (sport === "f1") {
-    return getStorageUrl(`team-logos/f1/${code}.png`);
+    return logoPath(`teams/f1/${code}.png`);
   }
   if (sport === "cricket" && leagueCode) {
-    return getStorageUrl(`team-logos/cricket/${leagueCode}/${code}.png`);
+    return logoPath(`teams/cricket/${leagueCode}/${code}.png`);
   }
   return null;
 }
@@ -45,17 +43,18 @@ export function teamLogoUrl(
 /**
  * Get the logo URL for a competition by its short code.
  *
- * Example: competitionLogoUrl("EPL") → .../competition-logos/EPL.png
+ * Example: competitionLogoUrl("EPL") → /logos/competition/EPL.png
  */
 export function competitionLogoUrl(code: string): string | null {
-  return getStorageUrl(`competition-logos/${code}.png`);
+  if (!code) return null;
+  return logoPath(`competition/${code}.png`);
 }
 
 /**
  * Get the photo URL for an F1 driver by their 3-letter code.
  *
- * Example: driverPhotoUrl("VER") → .../drivers/VER.png
+ * Example: driverPhotoUrl("VER") → /logos/drivers/VER.png
  */
 export function driverPhotoUrl(code: string): string | null {
-  return getStorageUrl(`drivers/${code}.png`);
+  return logoPath(`drivers/${code}.png`);
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TeamLogo } from "../TeamLogo";
+import { competitionLogoUrl } from "../../lib/image-utils";
 import {
   fetchFootballStandings,
   fetchFootballFixtures,
@@ -90,7 +91,7 @@ export function BundesligaSection() {
     <>
       <div className="section-hero fade-in">
         <div className="hero-bar" style={{ background: ACCENT }} />
-        <div className="hero-icon">🇩🇪</div>
+        <div className="hero-icon"><img src={competitionLogoUrl("BUN") ?? ""} alt="Bundesliga" style={{ width: "100%", height: "100%", objectFit: "contain" }} /></div>
         <div className="hero-text">
           <h2>BUNDESLIGA</h2>
           <p>Germany — 2025/26 Season</p>
