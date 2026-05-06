@@ -10,9 +10,21 @@
  */
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_BUCKET = "sport-assets";
 
 function logoPath(rel: string): string {
   return `${BASE_PATH}/logos/${rel}`;
+}
+
+/**
+ * Build a Supabase Storage public URL for a given path.
+ * Used by dynamic site_content (CMS) — not for logos.
+ * Returns null if Supabase is not configured.
+ */
+export function getStorageUrl(path: string): string | null {
+  if (!SUPABASE_URL || !path) return null;
+  return `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${path}`;
 }
 
 /**
