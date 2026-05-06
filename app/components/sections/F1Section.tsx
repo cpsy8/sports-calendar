@@ -5,9 +5,11 @@ import {
   fetchF1DriverStandings,
   fetchF1ConstructorStandings,
   fetchF1Calendar,
+  fetchF1RaceResults,
   type F1DriverRow,
   type F1ConstructorRow,
   type F1RaceRow,
+  type F1RaceResultRow,
 } from "../../lib/fetch-standings-client";
 import { F1_TEAM_COLORS, todayStr } from "../../lib/team-meta";
 import { NewsTab } from "../NewsTab";
@@ -81,17 +83,39 @@ function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void 
   );
 }
 
-function Placeholder({ label }: { label: string }) {
-  return (
-    <div className="card fade-in" style={{ textAlign: "center", padding: "3rem 1.5rem", color: "var(--text-muted)" }}>
-      <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🚧</div>
-      <div style={{ fontWeight: 600 }}>{label} — Coming soon</div>
-    </div>
-  );
-}
-
 function Loading() {
   return <div style={{ color: "var(--text-muted)", padding: "1rem 0", fontSize: "0.85rem" }}>Loading…</div>;
+}
+
+function Breadcrumb({ race, onBack }: { race: F1RaceRow; onBack: () => void }) {
+  const flag = COUNTRY_FLAGS[race.country] ?? "🏁";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
+      <button
+        onClick={onBack}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.3rem",
+          background: "none",
+          border: `1px solid var(--border-subtle)`,
+          borderRadius: "6px",
+          padding: "0.25rem 0.6rem",
+          cursor: "pointer",
+          color: "var(--text-secondary)",
+          fontSize: "0.78rem",
+          fontWeight: 500,
+        }}
+      >
+        ← Back
+      </button>
+      <span style={{ color: "var(--text-muted)" }}>F1 Schedule</span>
+      <span style={{ color: "var(--text-muted)" }}>/</span>
+      <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+        {flag} R{race.round} — {race.country} Grand Prix
+      </span>
+    </div>
+  );
 }
 
 export function F1Section() {
@@ -100,6 +124,9 @@ export function F1Section() {
   const [constructors, setConstructors] = useState<F1ConstructorRow[]>([]);
   const [calendar, setCalendar] = useState<F1RaceRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRound, setSelectedRound] = useState<F1RaceRow | null>(null);
+  const [raceResults, setRaceResults] = useState<F1RaceResultRow[]>([]);
+  const [resultsLoading, setResultsLoading] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -107,12 +134,34 @@ export function F1Section() {
       fetchF1ConstructorStandings(),
       fetchF1Calendar(),
     ]).then(([d, c, cal]) => {
-      setDrivers(d);
-      setConstructors(c);
+      setDrivers([...d].sort((a, b) => Number(b.points) - Number(a.points)));
+      setConstructors([...c].sort((a, b) => Number(b.points) - Number(a.points)));
       setCalendar(cal);
       setLoading(false);
     });
   }, []);
+
+  function handleRoundClick(race: F1RaceRow) {
+    if (race.status !== "completed") return;
+    setSelectedRound(race);
+    setRaceResults([]);
+    setResultsLoading(true);
+    fetchF1RaceResults(String(race.season), race.round).then((results) => {
+      setRaceResults([...results].sort((a, b) => (a.position ?? 99) - (b.position ?? 99)));
+      setResultsLoading(false);
+    });
+  }
+
+  function handleBack() {
+    setSelectedRound(null);
+    setRaceResults([]);
+  }
+
+  // When user switches away from schedule tab, clear selected round
+  function handleTabChange(tab: Tab) {
+    if (tab !== "schedule") setSelectedRound(null);
+    setActiveTab(tab);
+  }
 
   const today = todayStr();
   const maxPts = drivers.length > 0 ? Number(drivers[0].points) : 1;
@@ -140,7 +189,7 @@ export function F1Section() {
         )}
       </div>
 
-      <TabBar active={activeTab} onChange={setActiveTab} />
+      <TabBar active={activeTab} onChange={handleTabChange} />
 
       {activeTab === "news" && <NewsTab competition="Formula 1" accent={ACCENT} />}
 
@@ -156,7 +205,7 @@ export function F1Section() {
               const pct = maxPts > 0 ? Math.round((Number(d.points) / maxPts) * 100) : 0;
               const color = F1_TEAM_COLORS[d.team] ?? "#888";
               return (
-                <div className="driver-bar-row" key={d.position}>
+                <div className="driver-bar-row" key={d.driver}>
                   <div className="driver-bar-pos">{d.position}</div>
                   <div className="driver-bar-name">{driverLastName(d.driver)}</div>
                   <div className="driver-bar-track">
@@ -192,7 +241,7 @@ export function F1Section() {
                   {constructors.map((c) => {
                     const color = F1_TEAM_COLORS[c.driver] ?? "#888";
                     return (
-                      <tr key={c.position}>
+                      <tr key={c.driver}>
                         <td><span className="pos-num">{c.position}</span></td>
                         <td>
                           <div className="team-cell">
@@ -211,7 +260,7 @@ export function F1Section() {
         </div>
       )}
 
-      {activeTab === "schedule" && (
+      {activeTab === "schedule" && !selectedRound && (
         <div className="grid-12 fade-in fd2">
           <div className="card span-12">
             <div className="card-header">
@@ -224,8 +273,17 @@ export function F1Section() {
                 {calendar.map((r) => {
                   const displayStatus = raceDisplayStatus(r, today, nextScheduledRound);
                   const flag = COUNTRY_FLAGS[r.country] ?? "🏁";
+                  const isCompleted = r.status === "completed";
                   return (
-                    <div className="race-item" key={r.round}>
+                    <div
+                      className="race-item"
+                      key={r.round}
+                      onClick={() => handleRoundClick(r)}
+                      style={{
+                        cursor: isCompleted ? "pointer" : "default",
+                        transition: "background 0.15s",
+                      }}
+                    >
                       <div className="race-round">R{r.round}</div>
                       <div className="race-flag">{flag}</div>
                       <div className="race-info">
@@ -235,13 +293,70 @@ export function F1Section() {
                       <div>
                         <div className="race-date">{formatRaceDate(r.date)}</div>
                         <div className={`race-status ${displayStatus}`}>
-                          {displayStatus === "next" ? "NEXT" : displayStatus === "completed" ? "Done" : displayStatus === "live" ? "LIVE" : "Upcoming"}
+                          {displayStatus === "next" ? "NEXT" : displayStatus === "completed" ? "Results ›" : displayStatus === "live" ? "LIVE" : "Upcoming"}
                         </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {activeTab === "schedule" && selectedRound && (
+        <div className="grid-12 fade-in fd2">
+          <div className="span-12">
+            <Breadcrumb race={selectedRound} onBack={handleBack} />
+          </div>
+          <div className="card span-12">
+            <div className="card-header">
+              <div className="card-title">Race Results — {selectedRound.country} Grand Prix</div>
+              <div style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                Round {selectedRound.round} · {formatRaceDate(selectedRound.date)} · {selectedRound.circuit}
+              </div>
+            </div>
+            {resultsLoading ? <Loading /> : raceResults.length === 0 ? (
+              <div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>No results available yet.</div>
+            ) : (
+              <table className="standings-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th>Grid</th>
+                    <th>Laps</th>
+                    <th>Status</th>
+                    <th>Pts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {raceResults.map((r, i) => {
+                    const color = F1_TEAM_COLORS[r.constructor] ?? "#888";
+                    return (
+                      <tr key={i}>
+                        <td><span className="pos-num">{r.position ?? "—"}</span></td>
+                        <td>
+                          <div className="team-cell">
+                            <div className="driver-team-line" style={{ background: color }} />
+                            {r.driver}
+                            {r.is_fastest_lap && (
+                              <span style={{ marginLeft: "0.4rem", color: "#a855f7", fontSize: "0.7rem", fontWeight: 700 }}>⚡FL</span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>{r.constructor}</td>
+                        <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.grid ?? "—"}</td>
+                        <td style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{r.laps}</td>
+                        <td style={{ color: r.status_text === "Finished" ? "var(--text-secondary)" : "#f87171", fontSize: "0.8rem" }}>{r.status_text}</td>
+                        <td className="points-cell">{Number(r.points)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
         </div>

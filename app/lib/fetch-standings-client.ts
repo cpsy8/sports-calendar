@@ -178,6 +178,29 @@ export async function fetchF1Calendar(): Promise<F1RaceRow[]> {
   return (data as F1RaceRow[]) ?? [];
 }
 
+export interface F1RaceResultRow {
+  position: number | null;
+  driver: string;
+  constructor: string;
+  grid: number | null;
+  laps: number;
+  status_text: string;
+  points: number;
+  is_fastest_lap: boolean;
+}
+
+export async function fetchF1RaceResults(season: string, round: number): Promise<F1RaceResultRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("f1_race_results")
+    .select("position,driver,constructor,grid,laps,status_text,points,is_fastest_lap")
+    .eq("season", season)
+    .eq("round", round)
+    .order("position", { ascending: true });
+  return (data as F1RaceResultRow[]) ?? [];
+}
+
 export interface NewsArticleRow {
   id: string;
   sport: string;
