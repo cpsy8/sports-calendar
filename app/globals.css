@@ -231,7 +231,8 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
   height: 100%;
   border-radius: 4px 0 0 4px;
 }
-.hero-icon { font-size: 1.8rem; flex-shrink: 0; margin-left: 8px; }
+.hero-icon { font-size: 1.8rem; flex-shrink: 0; margin-left: 8px; width: 2.4rem; height: 2.4rem; display: inline-flex; align-items: center; justify-content: center; }
+.hero-icon img { width: 100%; height: 100%; object-fit: contain; }
 .hero-text h2 {
   font-family: var(--font-bebas-neue, 'Bebas Neue', sans-serif);
   font-size: 1.9rem;
