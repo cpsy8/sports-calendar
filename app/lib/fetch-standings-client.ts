@@ -67,6 +67,7 @@ export interface F1RaceRow {
   date: string;
   status: string;
   has_sprint: boolean;
+  name?: string | null;
 }
 
 export interface IPLStandingRow {
@@ -88,6 +89,7 @@ const FOOTBALL_TABLE_MAP: Record<string, string> = {
   "Serie A": "serie_a_standings",
   "Ligue 1": "ligue_1_standings",
   "Indian Super League": "isl_standings",
+  "UEFA Europa League": "europa_league_standings",
 };
 
 async function getStandingId(competition: string): Promise<string | null> {

@@ -29,6 +29,38 @@ const TABS: { id: Tab; label: string }[] = [
 const ACCENT = "#e10600";
 const SPRINT_COLOR = "#f59e0b";
 
+const CIRCUIT_TO_GP_NAME: Record<string, string> = {
+  "Albert Park Circuit": "Australian Grand Prix",
+  "Shanghai International Circuit": "Chinese Grand Prix",
+  "Suzuka Circuit": "Japanese Grand Prix",
+  "Bahrain International Circuit": "Bahrain Grand Prix",
+  "Jeddah Corniche Circuit": "Saudi Arabian Grand Prix",
+  "Miami International Autodrome": "Miami Grand Prix",
+  "Circuit Gilles Villeneuve": "Canadian Grand Prix",
+  "Circuit de Monaco": "Monaco Grand Prix",
+  "Circuit de Barcelona-Catalunya": "Spanish Grand Prix",
+  "Red Bull Ring": "Austrian Grand Prix",
+  "Silverstone Circuit": "British Grand Prix",
+  "Circuit de Spa-Francorchamps": "Belgian Grand Prix",
+  "Hungaroring": "Hungarian Grand Prix",
+  "Circuit Zandvoort": "Dutch Grand Prix",
+  "Autodromo Nazionale Monza": "Italian Grand Prix",
+  "Circuit de Madrid": "Madrid Grand Prix",
+  "Baku City Circuit": "Azerbaijan Grand Prix",
+  "Marina Bay Street Circuit": "Singapore Grand Prix",
+  "Circuit of The Americas": "United States Grand Prix",
+  "Autodromo Hermanos Rodriguez": "Mexico City Grand Prix",
+  "Autodromo Jose Carlos Pace": "São Paulo Grand Prix",
+  "Las Vegas Strip Circuit": "Las Vegas Grand Prix",
+  "Losail International Circuit": "Qatar Grand Prix",
+  "Yas Marina Circuit": "Abu Dhabi Grand Prix",
+};
+
+function raceName(race: { name?: string | null; circuit: string; country: string }): string {
+  if (race.name) return race.name;
+  return CIRCUIT_TO_GP_NAME[race.circuit] ?? `${race.country} Grand Prix`;
+}
+
 const COUNTRY_FLAGS: Record<string, string> = {
   Australia: "🇦🇺", China: "🇨🇳", Japan: "🇯🇵", Bahrain: "🇧🇭",
   "Saudi Arabia": "🇸🇦", USA: "🇺🇸", "United States": "🇺🇸",
@@ -116,7 +148,7 @@ function Breadcrumb({ race, onBack }: { race: F1RaceRow; onBack: () => void }) {
       <span style={{ color: "var(--text-muted)" }}>F1 Schedule</span>
       <span style={{ color: "var(--text-muted)" }}>/</span>
       <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-        {flag} R{race.round} — {race.country} Grand Prix
+        {flag} R{race.round} — {raceName(race)}
       </span>
     </div>
   );
@@ -347,7 +379,7 @@ export function F1Section() {
                       <div className="race-flag">{flag}</div>
                       <div className="race-info">
                         <div className="race-name" style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                          {r.country} Grand Prix
+                          {raceName(r)}
                           {r.has_sprint && (
                             <span style={{
                               fontSize: "0.62rem",
@@ -389,7 +421,7 @@ export function F1Section() {
             <div className="card-header">
               <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
                 <div className="card-title" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  {selectedRound.country} Grand Prix
+                  {raceName(selectedRound)}
                   {selectedRound.has_sprint && (
                     <span style={{
                       fontSize: "0.65rem",
