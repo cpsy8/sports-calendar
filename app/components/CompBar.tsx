@@ -2,7 +2,7 @@
 
 import type { SportGroup } from "./Navbar";
 
-export type CompId = "pl" | "ucl" | "laliga" | "seriea" | "bundesliga" | "wc2026" | "f1main" | "ipl";
+export type CompId = "pl" | "ucl" | "uel" | "laliga" | "seriea" | "bundesliga" | "ligue1" | "isl" | "wc2026" | "f1main" | "ipl";
 
 interface CompTab {
   id: CompId;
@@ -12,10 +12,13 @@ interface CompTab {
 
 const FOOTBALL_TABS: CompTab[] = [
   { id: "pl", label: "Premier League", color: "#3dffa2" },
-  { id: "ucl", label: "Champions League", color: "#ffd700" },
   { id: "laliga", label: "La Liga", color: "#ff4b44" },
   { id: "seriea", label: "Serie A", color: "#008fd5" },
   { id: "bundesliga", label: "Bundesliga", color: "#d20515" },
+  { id: "ligue1", label: "Ligue 1", color: "#091c3e" },
+  { id: "isl", label: "Indian Super League", color: "#ff6f00" },
+  { id: "ucl", label: "Champions League", color: "#ffd700" },
+  { id: "uel", label: "Europa League", color: "#ff6900" },
   { id: "wc2026", label: "World Cup 2026", color: "#0066cc" },
 ];
 
