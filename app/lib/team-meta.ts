@@ -1,7 +1,7 @@
 /**
  * Maps DB team name → 3-letter display code for TeamLogo.
  * Source of truth: my-public-database/config/constants.py.
- * Override: BAR for Barcelona, FCB for Bayern Munich.
+ * Legacy: FCB for Barcelona, BAY for Bayern Munich.
  */
 export const TEAM_CODE_MAP: Record<string, string> = {
   // EPL
@@ -18,7 +18,7 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   "Wolverhampton Wanderers": "WOL", Wolverhampton: "WOL", Wolves: "WOL",
   Burnley: "BUR", "Leeds United": "LEE", Leeds: "LEE",
   // La Liga
-  "Real Madrid": "RMA", Barcelona: "BAR", "FC Barcelona": "BAR",
+  "Real Madrid": "RMA", Barcelona: "FCB", "FC Barcelona": "FCB",
   "Atletico Madrid": "ATM", "Atlético Madrid": "ATM",
   "Athletic Club": "ATH", "Athletic Bilbao": "ATH",
   "Real Sociedad": "RSO", Villarreal: "VIL", "Real Betis": "BET",
@@ -30,7 +30,7 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   Espanyol: "ESP", "Las Palmas": "LPA", Mallorca: "MLL",
   "Leganés": "LEG", Leganes: "LEG", "Real Valladolid": "VLL", Valladolid: "VLL",
   // Bundesliga
-  "Bayern Munich": "FCB", "Borussia Dortmund": "BVB", "RB Leipzig": "RBL",
+  "Bayern Munich": "BAY", "Borussia Dortmund": "BVB", "RB Leipzig": "RBL",
   "Bayer Leverkusen": "B04", "Eintracht Frankfurt": "SGE",
   "SC Freiburg": "SCF", Freiburg: "SCF", "Werder Bremen": "SVW",
   "VfB Stuttgart": "VFB", Stuttgart: "VFB",
@@ -86,14 +86,14 @@ export const TEAM_COLORS: Record<string, string> = {
   EVE: "#003399", IPS: "#003399", LEI: "#003090", SOU: "#d71920",
   SUN: "#eb172b", BUR: "#6c1d45", LEE: "#ffcd00",
   // La Liga
-  BAR: "#004d98", RMA: "#e8e8e8", ATM: "#cb3524", RSO: "#005ea5",
+  FCB: "#004d98", RMA: "#e8e8e8", ATM: "#cb3524", RSO: "#005ea5",
   VIL: "#fde047", BET: "#005ba1", ATH: "#cc1a1a", SEV: "#d71920",
   GIR: "#c8102e", OSA: "#034694", CEL: "#7ab2e8", RAY: "#e30613",
   MLL: "#d71920", LPA: "#ffd700", GET: "#035AA6", LEG: "#004b8d",
   VAL: "#f5a623", ALA: "#004b8d", ESP: "#0067b1", VLL: "#7b2d8e",
   ELC: "#0c5cc4", DEP: "#005baa",
   // Bundesliga
-  FCB: "#dc0000", BVB: "#fde047", B04: "#e30613", RBL: "#004b8d",
+  BAY: "#dc0000", BVB: "#fde047", B04: "#e30613", RBL: "#004b8d",
   WOB: "#1e5128", VFB: "#e1000f", SGE: "#e30613", SCF: "#cc0000",
   UNB: "#cc0000", BMG: "#000000", SVW: "#009739", TSG: "#1961AC",
   FCA: "#ba3733", M05: "#c3212f", HDH: "#CC0000", KIE: "#004a9f",
