@@ -29,6 +29,7 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   Elche: "ELC", Levante: "LEV",
   Espanyol: "ESP", "Las Palmas": "LPA", Mallorca: "MLL",
   "Leganés": "LEG", Leganes: "LEG", "Real Valladolid": "VLL", Valladolid: "VLL",
+  "Real Oviedo": "OVI", Oviedo: "OVI",
   // Bundesliga
   "Bayern Munich": "BAY", "Borussia Dortmund": "BVB", "RB Leipzig": "RBL",
   "Bayer Leverkusen": "B04", "Eintracht Frankfurt": "SGE",
@@ -68,6 +69,20 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   Norway: "NOR", Portugal: "POR", Scotland: "SCO", Senegal: "SEN",
   "South Korea": "KOR", "Korea Republic": "KOR", Spain: "ESP",
   Turkey: "TUR", Türkiye: "TUR", USA: "USA", "United States": "USA",
+  Algeria: "ALG", Australia: "AUS", Austria: "AUT", Belgium: "BEL",
+  "Bosnia and Herzegovina": "BIH", Bosnia: "BIH",
+  Canada: "CAN", Colombia: "COL",
+  "DR Congo": "COD", "Congo DR": "COD", "Democratic Republic of Congo": "COD",
+  Curacao: "CUW", Curaçao: "CUW",
+  Czechia: "CZE", "Czech Republic": "CZE",
+  Ecuador: "ECU", Egypt: "EGY", Ghana: "GHA", Haiti: "HAI",
+  Iran: "IRN", "IR Iran": "IRN", Iraq: "IRQ", Jordan: "JOR",
+  "New Zealand": "NZL", Panama: "PAN", Paraguay: "PAR", Qatar: "QAT",
+  "South Africa": "RSA", Sweden: "SWE", Switzerland: "SUI",
+  Uruguay: "URU", Uzbekistan: "UZB",
+  // FIFA aliases — files not yet uploaded
+  "Ivory Coast": "CIV", "Côte d'Ivoire": "CIV", "Cote d'Ivoire": "CIV",
+  "Cape Verde": "CPV", "Cabo Verde": "CPV",
   // IPL
   "Chennai Super Kings": "CSK", "Mumbai Indians": "MI",
   "Royal Challengers Bengaluru": "RCB", "Royal Challengers Bangalore": "RCB",
@@ -91,7 +106,7 @@ export const TEAM_COLORS: Record<string, string> = {
   GIR: "#c8102e", OSA: "#034694", CEL: "#7ab2e8", RAY: "#e30613",
   MLL: "#d71920", LPA: "#ffd700", GET: "#035AA6", LEG: "#004b8d",
   VAL: "#f5a623", ALA: "#004b8d", ESP: "#0067b1", VLL: "#7b2d8e",
-  ELC: "#0c5cc4", DEP: "#005baa",
+  ELC: "#0c5cc4", DEP: "#005baa", OVI: "#0a3a85",
   // Bundesliga
   BAY: "#dc0000", BVB: "#fde047", B04: "#e30613", RBL: "#004b8d",
   WOB: "#1e5128", VFB: "#e1000f", SGE: "#e30613", SCF: "#cc0000",
