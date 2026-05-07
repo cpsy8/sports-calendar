@@ -6,10 +6,13 @@
  * deterministic 404 that <TeamLogo> handles via onError fallback.
  *
  * basePath note: assetPrefix only auto-prefixes Next-managed assets (CSS/JS).
- * Raw <img src="..."> needs manual prefix, so we read NEXT_PUBLIC_BASE_PATH.
+ * Raw <img src="..."> needs manual prefix. We mirror next.config's basePath
+ * logic: production builds always target /sports-calendar (GitHub Pages),
+ * dev runs from "/". Next inlines NODE_ENV at build, so the literal is
+ * baked into client bundles — no extra env var or workflow plumbing needed.
  */
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const BASE_PATH = process.env.NODE_ENV === "production" ? "/sports-calendar" : "";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_BUCKET = "sport-assets";
 

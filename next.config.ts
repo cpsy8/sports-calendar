@@ -1,19 +1,17 @@
 import type { NextConfig } from "next";
 
-// GITHUB_ACTIONS is set automatically by GitHub Actions runners.
-// We only want `output: "export"` (static export) in CI — local builds
-// keep API routes working for dev.
-const isCI = process.env.GITHUB_ACTIONS === "true";
+// Production builds always target GitHub Pages at /sports-calendar.
+// `next dev` keeps NODE_ENV=development → basePath "" → API routes work.
+// Keying off NODE_ENV (auto-inlined by Next) lets client utils derive the
+// same basePath without separate env plumbing.
+const isProd = process.env.NODE_ENV === "production";
 
-const basePath = isCI ? "/sports-calendar" : "";
+const basePath = isProd ? "/sports-calendar" : "";
 
 const nextConfig: NextConfig = {
-  ...(isCI ? { output: "export" } : {}),
+  ...(isProd ? { output: "export" } : {}),
   basePath,
-  assetPrefix: isCI ? "/sports-calendar/" : "",
-  env: {
-    NEXT_PUBLIC_BASE_PATH: basePath,
-  },
+  assetPrefix: isProd ? "/sports-calendar/" : "",
 };
 
 export default nextConfig;
