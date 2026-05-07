@@ -44,6 +44,8 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   "FC St. Pauli": "STP", "St. Pauli": "STP",
   "VfL Bochum": "BOC", Bochum: "BOC",
   "Holstein Kiel": "KIE", "1. FC Holstein Kiel": "KIE",
+  "Hamburger SV": "HSV", Hamburg: "HSV",
+  "1. FC Köln": "KOE", "FC Köln": "KOE", "FC Koln": "KOE", Köln: "KOE", Cologne: "KOE",
   // Serie A
   "Inter Milan": "INT", Napoli: "NAP", Juventus: "JUV", "AC Milan": "ACM",
   Atalanta: "ATA", Lazio: "LAZ", Roma: "ROM", "AS Roma": "ROM",
@@ -51,6 +53,9 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   Genoa: "GEN", Cagliari: "CAG", "Hellas Verona": "VER", Verona: "VER",
   Lecce: "LEC", Parma: "PAR", Empoli: "EMP", Monza: "MON",
   Como: "COM", Venezia: "VEN",
+  Cremonese: "CRE", "US Cremonese": "CRE",
+  Pisa: "PIS", "Pisa Sporting Club": "PIS",
+  Sassuolo: "SAS", "US Sassuolo Calcio": "SAS",
   // Ligue 1
   "Paris Saint-Germain": "PSG", PSG: "PSG", Marseille: "MAR",
   "Olympique de Marseille": "MAR", Monaco: "ASM", "AS Monaco": "ASM",
@@ -62,6 +67,8 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   Brest: "SB2", "Stade Brestois": "SB2", Angers: "ANG",
   Auxerre: "AJA", "Saint-Etienne": "STE", "Saint-Étienne": "STE",
   Metz: "FCM", "FC Metz": "FCM", Clermont: "CFF",
+  Lorient: "FCL", "FC Lorient": "FCL",
+  "Paris FC": "PFC",
   // World Cup — FIFA national-team codes
   Argentina: "ARG", Brazil: "BRA", Chile: "CHI", Croatia: "CRO",
   England: "ENG", France: "FRA", Germany: "GER", Japan: "JPN",
@@ -80,9 +87,21 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   "New Zealand": "NZL", Panama: "PAN", Paraguay: "PAR", Qatar: "QAT",
   "South Africa": "RSA", Sweden: "SWE", Switzerland: "SUI",
   Uruguay: "URU", Uzbekistan: "UZB",
-  // FIFA aliases — files not yet uploaded
+  "Saudi Arabia": "KSA", Tunisia: "TUN",
   "Ivory Coast": "CIV", "Côte d'Ivoire": "CIV", "Cote d'Ivoire": "CIV",
   "Cape Verde": "CPV", "Cabo Verde": "CPV",
+  // ISL — Indian Super League
+  "Mohun Bagan Super Giant": "MBSG", "East Bengal FC": "EBFC", "East Bengal": "EBFC",
+  "Kerala Blasters FC": "KBFC", "Kerala Blasters": "KBFC",
+  "FC Goa": "FCG", "Mumbai City FC": "MCFC", "Mumbai City": "MCFC",
+  "Bengaluru FC": "BFC", Bengaluru: "BFC",
+  "Jamshedpur FC": "JFC", Jamshedpur: "JFC",
+  "NorthEast United FC": "NEUFC", "NorthEast United": "NEUFC",
+  "Odisha FC": "OFC", Odisha: "OFC",
+  "Punjab FC": "PFC", Punjab: "PFC",
+  "Mohammedan SC": "MSC",
+  "Chennaiyin FC": "CFC", Chennaiyin: "CFC",
+  "Inter Kashi": "IK",
   // IPL
   "Chennai Super Kings": "CSK", "Mumbai Indians": "MI",
   "Royal Challengers Bengaluru": "RCB", "Royal Challengers Bangalore": "RCB",
