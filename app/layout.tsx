@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
-import { Outfit, JetBrains_Mono, Bebas_Neue } from "next/font/google";
+import { Inter, Fraunces, Archivo, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+});
+
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800", "900"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -14,14 +27,8 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500", "600", "700"],
 });
 
-const bebasNeue = Bebas_Neue({
-  variable: "--font-bebas-neue",
-  subsets: ["latin"],
-  weight: ["400"],
-});
-
 export const metadata: Metadata = {
-  title: "SportPulse — Live Scores, Standings & Fixtures",
+  title: "Matchday — Live Scores, Standings & Fixtures",
   description: "Live scores, standings and fixtures for Football, F1 and Cricket",
   icons: {
     icon: "assets/whistle.png",
@@ -36,14 +43,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Apply saved theme before first paint — prevents flash */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('sp-theme');if(t==='light'){document.documentElement.classList.add('light')}}catch(e){}})()`,
+            __html: `(function(){try{var t=localStorage.getItem('md-theme')||'stadium';document.documentElement.setAttribute('data-theme',t);}catch(e){}})()`,
           }}
         />
       </head>
       <body
-        className={`${outfit.variable} ${jetbrainsMono.variable} ${bebasNeue.variable}`}
+        className={`${inter.variable} ${fraunces.variable} ${archivo.variable} ${jetbrainsMono.variable}`}
       >
         {children}
       </body>
