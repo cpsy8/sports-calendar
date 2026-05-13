@@ -90,7 +90,7 @@ export const TEAM_CODE_MAP: Record<string, string> = {
   Uruguay: "URU", Uzbekistan: "UZB",
   "Saudi Arabia": "KSA", Tunisia: "TUN",
   "Ivory Coast": "CIV", "Côte d'Ivoire": "CIV", "Cote d'Ivoire": "CIV",
-  "Cape Verde": "CPV", "Cabo Verde": "CPV",
+  "Cape Verde": "CPV", "Cabo Verde": "CPV", "Cape Verde Islands": "CPV",
   // ISL — Indian Super League
   "Mohun Bagan Super Giant": "MBSG", "East Bengal FC": "EBFC", "East Bengal": "EBFC",
   "Kerala Blasters FC": "KBFC", "Kerala Blasters": "KBFC",
@@ -159,6 +159,48 @@ export const F1_TEAM_COLORS: Record<string, string> = {
   Alpine: "#2293D1", Sauber: "#52E252", "Kick Sauber": "#52E252",
   Cadillac: "#cccccc",
 };
+
+/**
+ * Maps team code → home league folder under public/logos/teams/.
+ * Used to resolve logos for cross-league competitions (UCL, UEL)
+ * where teams come from multiple domestic leagues but have no
+ * competition-specific logo folder.
+ */
+export const TEAM_LEAGUE: Record<string, string> = {
+  // EPL
+  ARS: "epl", AVL: "epl", BOU: "epl", BRE: "epl", BHA: "epl", CHE: "epl",
+  CRY: "epl", EVE: "epl", FUL: "epl", IPS: "epl", LEI: "epl", LIV: "epl",
+  MCI: "epl", MUN: "epl", NEW: "epl", NFO: "epl", SOU: "epl", SUN: "epl",
+  TOT: "epl", WHU: "epl", WOL: "epl", BUR: "epl", LEE: "epl",
+  // La Liga
+  RMA: "laliga", FCB: "laliga", ATM: "laliga", RSO: "laliga", ATH: "laliga",
+  VIL: "laliga", BET: "laliga", SEV: "laliga", VAL: "laliga", CEL: "laliga",
+  RAY: "laliga", GET: "laliga", GIR: "laliga", OSA: "laliga", ALA: "laliga",
+  ELC: "laliga", LEV: "laliga", ESP: "laliga", LPA: "laliga", MLL: "laliga",
+  LEG: "laliga", VLL: "laliga", OVI: "laliga",
+  // Bundesliga
+  BAY: "bundesliga", BVB: "bundesliga", RBL: "bundesliga", B04: "bundesliga",
+  SGE: "bundesliga", SCF: "bundesliga", SVW: "bundesliga", VFB: "bundesliga",
+  TSG: "bundesliga", WOB: "bundesliga", BMG: "bundesliga", UNB: "bundesliga",
+  M05: "bundesliga", FCA: "bundesliga", HDH: "bundesliga", STP: "bundesliga",
+  BOC: "bundesliga", KIE: "bundesliga", HSV: "bundesliga", KOE: "bundesliga",
+  // Serie A
+  INT: "seriea", NAP: "seriea", JUV: "seriea", ACM: "seriea", ATA: "seriea",
+  LAZ: "seriea", ROM: "seriea", FIO: "seriea", BOL: "seriea", TOR: "seriea",
+  UDI: "seriea", GEN: "seriea", CAG: "seriea", VER: "seriea", LEC: "seriea",
+  PAR: "seriea", EMP: "seriea", MON: "seriea", COM: "seriea", VEN: "seriea",
+  CRE: "seriea", PIS: "seriea", SAS: "seriea",
+  // Ligue 1
+  PSG: "ligue1", MAR: "ligue1", ASM: "ligue1", LIL: "ligue1", LYO: "ligue1",
+  NIC: "ligue1", LEN: "ligue1", STR: "ligue1", REN: "ligue1", NAN: "ligue1",
+  MHC: "ligue1", TFC: "ligue1", SDR: "ligue1", HAC: "ligue1", SB2: "ligue1",
+  ANG: "ligue1", AJA: "ligue1", STE: "ligue1", FCM: "ligue1", CFF: "ligue1",
+  FCL: "ligue1", PFC: "ligue1",
+};
+
+export function teamLeague(code: string): string | undefined {
+  return TEAM_LEAGUE[code];
+}
 
 export function teamCode(name: string): string {
   return TEAM_CODE_MAP[name] ?? name.substring(0, 3).toUpperCase();
