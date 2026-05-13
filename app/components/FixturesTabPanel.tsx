@@ -6,7 +6,7 @@ import {
   fetchFootballFixturesPaged,
   type FootballFixtureRow,
 } from "../lib/fetch-standings-client";
-import { teamCode, teamColor, formatFixtureDate, todayStr } from "../lib/team-meta";
+import { teamCode, teamColor, teamLeague, formatFixtureDate, todayStr } from "../lib/team-meta";
 
 interface Props {
   competitionShort: string;
@@ -23,6 +23,8 @@ function getTomorrow(today: string): string {
 function ResultRow({ r, league }: { r: FootballFixtureRow; league: string }) {
   const hCode = teamCode(r.home_team);
   const aCode = teamCode(r.away_team);
+  const hLeague = teamLeague(hCode) ?? league;
+  const aLeague = teamLeague(aCode) ?? league;
   return (
     <div
       style={{
@@ -42,7 +44,7 @@ function ResultRow({ r, league }: { r: FootballFixtureRow; league: string }) {
             marginBottom: "0.2rem",
           }}
         >
-          <TeamLogo code={hCode} sport="football" leagueCode={league} color={teamColor(hCode)} />
+          <TeamLogo code={hCode} sport="football" leagueCode={hLeague} color={teamColor(hCode)} />
           <span
             style={{
               fontSize: "0.78rem",
@@ -56,7 +58,7 @@ function ResultRow({ r, league }: { r: FootballFixtureRow; league: string }) {
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-          <TeamLogo code={aCode} sport="football" leagueCode={league} color={teamColor(aCode)} />
+          <TeamLogo code={aCode} sport="football" leagueCode={aLeague} color={teamColor(aCode)} />
           <span
             style={{
               fontSize: "0.78rem",
@@ -121,6 +123,8 @@ function ResultRow({ r, league }: { r: FootballFixtureRow; league: string }) {
 function FixtureRow({ f, league }: { f: FootballFixtureRow; league: string }) {
   const hCode = teamCode(f.home_team);
   const aCode = teamCode(f.away_team);
+  const hLeague = teamLeague(hCode) ?? league;
+  const aLeague = teamLeague(aCode) ?? league;
   return (
     <div
       style={{
@@ -140,7 +144,7 @@ function FixtureRow({ f, league }: { f: FootballFixtureRow; league: string }) {
             marginBottom: "0.2rem",
           }}
         >
-          <TeamLogo code={hCode} sport="football" leagueCode={league} color={teamColor(hCode)} />
+          <TeamLogo code={hCode} sport="football" leagueCode={hLeague} color={teamColor(hCode)} />
           <span
             style={{
               fontSize: "0.78rem",
@@ -154,7 +158,7 @@ function FixtureRow({ f, league }: { f: FootballFixtureRow; league: string }) {
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-          <TeamLogo code={aCode} sport="football" leagueCode={league} color={teamColor(aCode)} />
+          <TeamLogo code={aCode} sport="football" leagueCode={aLeague} color={teamColor(aCode)} />
           <span
             style={{
               fontSize: "0.78rem",
