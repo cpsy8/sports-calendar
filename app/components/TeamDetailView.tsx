@@ -124,8 +124,17 @@ export function TeamDetailView({ team, accent, onBack }: TeamDetailViewProps) {
           }}
         >
           <Crest url={team.crest} name={team.name} size={96} />
-          <div style={{ flex: 1, minWidth: 220 }}>
-            <h2 style={{ margin: 0, fontSize: "1.5rem", color: accent }}>{team.name}</h2>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "clamp(1.15rem, 4vw, 1.5rem)",
+                color: accent,
+                wordBreak: "break-word",
+              }}
+            >
+              {team.name}
+            </h2>
             {team.short_name && (
               <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: 2 }}>
                 {team.short_name}
@@ -135,10 +144,12 @@ export function TeamDetailView({ team, accent, onBack }: TeamDetailViewProps) {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                gridTemplateColumns:
+                  "repeat(auto-fill, minmax(min(160px, 100%), 1fr))",
                 gap: "0.5rem 1.25rem",
                 marginTop: "0.85rem",
                 fontSize: "0.8rem",
+                wordBreak: "break-word",
               }}
             >
               {team.founded && (
@@ -185,7 +196,8 @@ export function TeamDetailView({ team, accent, onBack }: TeamDetailViewProps) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fill, minmax(min(160px, 100%), 1fr))",
               gap: "0.5rem 1.25rem",
               fontSize: "0.85rem",
             }}
@@ -252,7 +264,8 @@ export function TeamDetailView({ team, accent, onBack }: TeamDetailViewProps) {
                 <div
                   style={{
                     display: "grid",
-                    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(min(180px, 100%), 1fr))",
                     gap: "0.5rem",
                   }}
                 >

@@ -390,7 +390,7 @@ function SkeletonRows({ n }: { n: number }) {
   );
 }
 
-const PANEL_HEIGHT = "clamp(400px, calc(100vh - 340px), 680px)";
+const PANEL_HEIGHT = "clamp(320px, calc(100vh - 280px), 680px)";
 
 export function FixturesTabPanel({ competitionShort, leagueCode, accent }: Props) {
   const today = todayStr();

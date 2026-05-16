@@ -180,7 +180,15 @@ function GroupCard({ name, rows }: { name: string; rows: WcGroupStandingRow[] })
 
 function BracketColumn({ title, fixtures }: { title: string; fixtures: FootballFixtureRow[] }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", minWidth: "200px" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.6rem",
+        minWidth: "clamp(160px, 60vw, 220px)",
+        flex: "0 0 auto",
+      }}
+    >
       <div style={{ fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: ACCENT }}>
         {title}
       </div>
@@ -313,7 +321,8 @@ export function WorldCup2026Section() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                gridTemplateColumns:
+                  "repeat(auto-fill, minmax(min(280px, 100%), 1fr))",
                 gap: "1rem",
               }}
             >
@@ -359,7 +368,8 @@ export function WorldCup2026Section() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                  gridTemplateColumns:
+                    "repeat(auto-fill, minmax(min(140px, 100%), 1fr))",
                   gap: "0.75rem",
                 }}
               >
