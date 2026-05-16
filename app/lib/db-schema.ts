@@ -54,6 +54,43 @@ export const footballScorers = pgTable("football_scorers", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+export const footballTeams = pgTable("football_teams", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  competitionShort: text("competition_short").notNull(),
+  teamApiId: integer("team_api_id").notNull(),
+  name: text("name").notNull(),
+  shortName: text("short_name"),
+  tla: text("tla"),
+  crest: text("crest"),
+  founded: integer("founded"),
+  venue: text("venue"),
+  website: text("website"),
+  clubColors: text("club_colors"),
+  address: text("address"),
+  coachName: text("coach_name"),
+  coachNationality: text("coach_nationality"),
+  coachDob: date("coach_dob"),
+  coachContractStart: date("coach_contract_start"),
+  coachContractUntil: date("coach_contract_until"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+export const footballPlayers = pgTable("football_players", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  teamApiId: integer("team_api_id").notNull(),
+  teamName: text("team_name").notNull(),
+  competitionShort: text("competition_short").notNull(),
+  playerApiId: integer("player_api_id").notNull(),
+  name: text("name").notNull(),
+  position: text("position"),
+  dob: date("dob"),
+  nationality: text("nationality"),
+  shirtNumber: integer("shirt_number"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 export const f1Fixtures = pgTable("f1_fixtures", {
   id: uuid("id").primaryKey().defaultRandom(),
   round: integer("round").notNull(),

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { competitionLogoUrl } from "../../lib/image-utils";
 import { FixturesTabPanel } from "../FixturesTabPanel";
 import { ScorersTab } from "../ScorersTab";
+import { TeamsTab } from "../TeamsTab";
 
 type Tab = "fixtures" | "stats" | "teams";
 
@@ -41,15 +42,6 @@ function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void 
   );
 }
 
-function Placeholder({ label }: { label: string }) {
-  return (
-    <div className="card fade-in" style={{ textAlign: "center", padding: "3rem 1.5rem", color: "var(--text-muted)" }}>
-      <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🚧</div>
-      <div style={{ fontWeight: 600 }}>{label} — Coming soon</div>
-    </div>
-  );
-}
-
 
 export function UCLSection() {
   const [activeTab, setActiveTab] = useState<Tab>("fixtures");
@@ -76,7 +68,9 @@ export function UCLSection() {
       )}
 
       {activeTab === "stats" && <ScorersTab competitionShort="UCL" />}
-      {activeTab === "teams" && <Placeholder label="Teams" />}
+      {activeTab === "teams" && (
+        <TeamsTab competitionShort="UCL" leagueCode="ucl" accent={ACCENT} />
+      )}
     </>
   );
 }

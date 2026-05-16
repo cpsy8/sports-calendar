@@ -10,6 +10,7 @@ import {
 import { teamCode, teamColor, formatGD } from "../../lib/team-meta";
 import { FixturesTabPanel } from "../FixturesTabPanel";
 import { ScorersTab } from "../ScorersTab";
+import { TeamsTab } from "../TeamsTab";
 
 type Tab = "fixtures" | "standings" | "stats" | "teams";
 
@@ -45,15 +46,6 @@ function TabBar({ active, onChange }: { active: Tab; onChange: (t: Tab) => void 
           {tab.label}
         </button>
       ))}
-    </div>
-  );
-}
-
-function Placeholder({ label }: { label: string }) {
-  return (
-    <div className="card fade-in" style={{ textAlign: "center", padding: "3rem 1.5rem", color: "var(--text-muted)" }}>
-      <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🚧</div>
-      <div style={{ fontWeight: 600 }}>{label} — Coming soon</div>
     </div>
   );
 }
@@ -137,7 +129,9 @@ export function SerieASection() {
       )}
 
       {activeTab === "stats" && <ScorersTab competitionShort="SRA" />}
-      {activeTab === "teams" && <Placeholder label="Teams" />}
+      {activeTab === "teams" && (
+        <TeamsTab competitionShort="SRA" leagueCode={LEAGUE} accent={ACCENT} />
+      )}
     </>
   );
 }
