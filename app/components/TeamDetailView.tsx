@@ -6,6 +6,11 @@ import {
   type FootballPlayerRow,
   type FootballTeamRow,
 } from "../lib/fetch-teams-client";
+import {
+  POSITION_ORDER,
+  positionCode,
+  positionGroupLabel,
+} from "../lib/sport-codes";
 
 interface TeamDetailViewProps {
   team: FootballTeamRow;
@@ -13,8 +18,6 @@ interface TeamDetailViewProps {
   leagueCode: string;
   onBack: () => void;
 }
-
-const POSITION_ORDER = ["Goalkeeper", "Defence", "Midfield", "Offence"] as const;
 
 function computeAge(dob: string | null): number | null {
   if (!dob) return null;
@@ -251,15 +254,35 @@ export function TeamDetailView({ team, accent, onBack }: TeamDetailViewProps) {
               <div key={pos}>
                 <div
                   style={{
-                    fontSize: "0.78rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.05em",
-                    color: accent,
-                    textTransform: "uppercase",
-                    marginBottom: "0.5rem",
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: "0.55rem",
+                    marginBottom: "0.6rem",
                   }}
                 >
-                  {pos}
+                  <span
+                    style={{
+                      fontSize: "0.78rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.08em",
+                      color: accent,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {positionGroupLabel(pos)}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.62rem",
+                      fontWeight: 600,
+                      color: "var(--text-muted)",
+                      letterSpacing: "0.06em",
+                      fontFamily:
+                        'var(--font-jetbrains-mono, "JetBrains Mono", monospace)',
+                    }}
+                  >
+                    {grouped[pos].length}
+                  </span>
                 </div>
                 <div
                   style={{
@@ -271,6 +294,7 @@ export function TeamDetailView({ team, accent, onBack }: TeamDetailViewProps) {
                 >
                   {grouped[pos].map((p) => {
                     const age = computeAge(p.dob);
+                    const posCode = positionCode(p.position);
                     return (
                       <div
                         key={p.id}
@@ -317,6 +341,23 @@ export function TeamDetailView({ team, accent, onBack }: TeamDetailViewProps) {
                             {age != null && ` · ${age}y`}
                           </div>
                         </div>
+                        <span
+                          title={p.position ?? undefined}
+                          style={{
+                            fontFamily:
+                              'var(--font-jetbrains-mono, "JetBrains Mono", monospace)',
+                            fontSize: "0.6rem",
+                            fontWeight: 700,
+                            letterSpacing: "0.05em",
+                            padding: "0.2rem 0.4rem",
+                            borderRadius: 4,
+                            background: "var(--border-subtle)",
+                            color: "var(--text-secondary)",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {posCode}
+                        </span>
                       </div>
                     );
                   })}

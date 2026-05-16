@@ -10,6 +10,7 @@ import {
   type WcGroupStandingRow,
 } from "../../lib/fetch-standings-client";
 import { teamCode, teamColor, formatFixtureDate, formatGD } from "../../lib/team-meta";
+import { stageLabel } from "../../lib/sport-codes";
 
 type Tab = "fixtures" | "groups" | "bracket" | "teams";
 
@@ -25,16 +26,6 @@ const LEAGUE = "wc2026";
 const KICKOFF_DATE = "2026-06-11";
 const FINAL_DATE = "2026-07-19";
 
-const STAGE_LABEL: Record<string, string> = {
-  group: "Group",
-  r32: "Round of 32",
-  r16: "Round of 16",
-  qf: "Quarter-final",
-  sf: "Semi-final",
-  third: "Third place",
-  final: "Final",
-};
-
 function daysUntil(target: string): number {
   const t = new Date(target + "T00:00:00Z").getTime();
   const n = Date.now();
@@ -47,14 +38,15 @@ function todayIso(): string {
 
 function StageChip({ stage, group }: { stage?: string | null; group?: string | null }) {
   if (!stage) return null;
-  const label = stage === "group" && group ? `Group ${group}` : (STAGE_LABEL[stage] ?? stage);
+  const label = stageLabel(stage, group);
   return (
     <span
       style={{
+        fontFamily: 'var(--font-jetbrains-mono, "JetBrains Mono", monospace)',
         fontSize: "0.62rem",
         fontWeight: 700,
         textTransform: "uppercase",
-        letterSpacing: "0.05em",
+        letterSpacing: "0.06em",
         padding: "0.18rem 0.5rem",
         borderRadius: "6px",
         background: `${ACCENT}22`,
@@ -189,7 +181,16 @@ function BracketColumn({ title, fixtures }: { title: string; fixtures: FootballF
         flex: "0 0 auto",
       }}
     >
-      <div style={{ fontWeight: 700, fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: ACCENT }}>
+      <div
+        style={{
+          fontFamily: 'var(--font-jetbrains-mono, "JetBrains Mono", monospace)',
+          fontWeight: 700,
+          fontSize: "0.78rem",
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          color: ACCENT,
+        }}
+      >
         {title}
       </div>
       {fixtures.length === 0 ? (
@@ -342,11 +343,11 @@ export function WorldCup2026Section() {
             <Empty icon="🎯" label="Bracket activates after the group stage" />
           ) : (
             <div style={{ display: "flex", gap: "1rem", overflowX: "auto", paddingBottom: "0.5rem" }}>
-              {r32.length > 0 && <BracketColumn title="Round of 32" fixtures={r32} />}
-              <BracketColumn title="Round of 16" fixtures={r16} />
-              <BracketColumn title="Quarter-finals" fixtures={qf} />
-              <BracketColumn title="Semi-finals" fixtures={sf} />
-              <BracketColumn title="Third place" fixtures={third} />
+              {r32.length > 0 && <BracketColumn title="R32" fixtures={r32} />}
+              <BracketColumn title="R16" fixtures={r16} />
+              <BracketColumn title="QF" fixtures={qf} />
+              <BracketColumn title="SF" fixtures={sf} />
+              <BracketColumn title="3rd Place" fixtures={third} />
               <BracketColumn title="Final" fixtures={final} />
             </div>
           )}
