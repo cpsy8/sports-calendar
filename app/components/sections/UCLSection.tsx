@@ -75,7 +75,7 @@ export function UCLSection() {
         <FixturesTabPanel competitionShort="UCL" leagueCode="ucl" accent={ACCENT} />
       )}
 
-      {activeTab === "stats" && <ScorersTab competitionShort="UCL" accent={ACCENT} />}
+      {activeTab === "stats" && <ScorersTab competitionShort="UCL" />}
       {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );

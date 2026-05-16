@@ -136,7 +136,7 @@ export function BundesligaSection() {
         </div>
       )}
 
-      {activeTab === "stats" && <ScorersTab competitionShort="BUN" accent={ACCENT} />}
+      {activeTab === "stats" && <ScorersTab competitionShort="BUN" />}
       {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );

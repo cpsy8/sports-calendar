@@ -136,7 +136,7 @@ export function PremierLeagueSection() {
         </div>
       )}
 
-      {activeTab === "stats" && <ScorersTab competitionShort="EPL" accent={ACCENT} />}
+      {activeTab === "stats" && <ScorersTab competitionShort="EPL" />}
       {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );

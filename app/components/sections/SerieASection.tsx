@@ -136,7 +136,7 @@ export function SerieASection() {
         </div>
       )}
 
-      {activeTab === "stats" && <ScorersTab competitionShort="SRA" accent={ACCENT} />}
+      {activeTab === "stats" && <ScorersTab competitionShort="SRA" />}
       {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );
