@@ -345,39 +345,77 @@ export function WorldCup2026Section() {
       )}
 
       {activeTab === "teams" && (
-        <div className="fade-in fd2">
-          {loading ? (
-            <Loading />
-          ) : teamsByGroup.length === 0 ? (
-            <Empty icon="🌍" label="Teams will appear after the draw is loaded" />
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: "1rem",
-              }}
-            >
-              {teamsByGroup.map(([name, rows]) => (
-                <div key={name} className="card">
-                  <div className="card-header">
-                    <div className="card-title">Group {name}</div>
-                  </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingTop: "0.5rem" }}>
-                    {rows.map((r) => {
-                      const code = teamCode(r.team);
-                      return (
-                        <div key={r.team} style={{ display: "flex", alignItems: "center", gap: "0.6rem", fontSize: "0.85rem" }}>
-                          <TeamLogo code={code} sport="football" leagueCode={LEAGUE} color={teamColor(code)} size={22} />
+        <div className="grid-12 fade-in fd2">
+          <div className="card span-12">
+            <div className="card-header">
+              <div className="card-title">Teams</div>
+            </div>
+
+            {loading ? (
+              <Loading />
+            ) : teamsByGroup.length === 0 ? (
+              <Empty icon="🌍" label="Teams will appear after the draw is loaded" />
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+                  gap: "0.75rem",
+                }}
+              >
+                {teamsByGroup.flatMap(([groupName, rows]) =>
+                  rows.map((r) => {
+                    const code = teamCode(r.team);
+                    return (
+                      <div
+                        key={r.team}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          padding: "1rem 0.75rem",
+                          borderRadius: 10,
+                          border: "1px solid var(--border-subtle)",
+                          background: "var(--card-bg, transparent)",
+                          transition: "transform 0.15s, border-color 0.15s, background 0.15s",
+                          textAlign: "center",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = ACCENT;
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = "var(--border-subtle)";
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }}
+                      >
+                        <TeamLogo
+                          code={code}
+                          sport="football"
+                          leagueCode={LEAGUE}
+                          color={teamColor(code)}
+                          size={64}
+                        />
+                        <div style={{ fontWeight: 600, fontSize: "0.82rem", lineHeight: 1.25 }}>
                           {r.team}
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+                        <div
+                          style={{
+                            fontSize: "0.7rem",
+                            color: "var(--text-muted)",
+                            lineHeight: 1.25,
+                          }}
+                        >
+                          Group {groupName}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>
