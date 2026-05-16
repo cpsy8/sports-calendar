@@ -9,6 +9,7 @@ import {
 } from "../../lib/fetch-standings-client";
 import { teamCode, teamColor, formatGD } from "../../lib/team-meta";
 import { FixturesTabPanel } from "../FixturesTabPanel";
+import { ScorersTab } from "../ScorersTab";
 
 type Tab = "fixtures" | "standings" | "stats" | "teams";
 
@@ -135,7 +136,7 @@ export function Ligue1Section() {
         </div>
       )}
 
-      {activeTab === "stats" && <Placeholder label="Stats" />}
+      {activeTab === "stats" && <ScorersTab competitionShort="LIG" accent={ACCENT} />}
       {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );
