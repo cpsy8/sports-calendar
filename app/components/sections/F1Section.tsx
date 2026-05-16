@@ -14,13 +14,11 @@ import {
   type F1SprintResultRow,
 } from "../../lib/fetch-standings-client";
 import { F1_TEAM_COLORS, todayStr } from "../../lib/team-meta";
-import { NewsTab } from "../NewsTab";
 
-type Tab = "news" | "schedule" | "teams" | "drivers";
+type Tab = "schedule" | "teams" | "drivers";
 type ResultTab = "race" | "sprint";
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: "news", label: "News" },
   { id: "schedule", label: "F1 Schedule" },
   { id: "teams", label: "Teams" },
   { id: "drivers", label: "Drivers" },
@@ -285,7 +283,6 @@ export function F1Section() {
 
       <TabBar active={activeTab} onChange={handleTabChange} />
 
-      {activeTab === "news" && <NewsTab competition="Formula 1" accent={ACCENT} />}
 
       {activeTab === "drivers" && (
         <div className="grid-12 fade-in fd2">
