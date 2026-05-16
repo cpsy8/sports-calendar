@@ -367,6 +367,59 @@ export async function fetchWcFixturesByStage(
   });
 }
 
+export interface FootballScorerRow {
+  position: number;
+  playerName: string;
+  playerNationality: string | null;
+  playerPosition: string | null;
+  teamName: string;
+  playedMatches: number;
+  goals: number;
+  assists: number | null;
+  penalties: number | null;
+  season: string;
+}
+
+interface FootballScorerDbRow {
+  position: number;
+  player_name: string;
+  player_nationality: string | null;
+  player_position: string | null;
+  team_name: string;
+  played_matches: number;
+  goals: number;
+  assists: number | null;
+  penalties: number | null;
+  season: string;
+}
+
+export async function fetchFootballScorers(
+  competitionShort: string,
+): Promise<FootballScorerRow[]> {
+  const supabase = createSupabaseClient();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("football_scorers")
+    .select(
+      "position,player_name,player_nationality,player_position,team_name,played_matches,goals,assists,penalties,season",
+    )
+    .eq("competition_short", competitionShort)
+    .order("position", { ascending: true });
+  const rows = (data as FootballScorerDbRow[]) ?? [];
+  return rows.map((r) => ({
+    position: r.position,
+    playerName: r.player_name,
+    playerNationality: r.player_nationality,
+    playerPosition: r.player_position,
+    teamName: r.team_name,
+    playedMatches: r.played_matches,
+    goals: r.goals,
+    assists: r.assists,
+    penalties: r.penalties,
+    season: r.season,
+  }));
+}
+
 export async function fetchIPLStandings(): Promise<IPLStandingRow[]> {
   const supabase = createSupabaseClient();
   if (!supabase) return [];

@@ -36,6 +36,24 @@ export const wcGroupStandings = pgTable("wc_group_standings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+export const footballScorers = pgTable("football_scorers", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  competition: text("competition").notNull(),
+  competitionShort: text("competition_short").notNull(),
+  season: text("season").notNull(),
+  position: integer("position").notNull(),
+  playerName: text("player_name").notNull(),
+  playerNationality: text("player_nationality"),
+  playerPosition: text("player_position"),
+  teamName: text("team_name").notNull(),
+  playedMatches: integer("played_matches").notNull(),
+  goals: integer("goals").notNull(),
+  assists: integer("assists"),
+  penalties: integer("penalties"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
 export const f1Fixtures = pgTable("f1_fixtures", {
   id: uuid("id").primaryKey().defaultRandom(),
   round: integer("round").notNull(),
