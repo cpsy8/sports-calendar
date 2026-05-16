@@ -54,7 +54,7 @@ export const footballScorers = pgTable("football_scorers", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
-export const footballTeams = pgTable("football_teams", {
+export const footballTeams = pgTable("football_team_details", {
   id: uuid("id").primaryKey().defaultRandom(),
   competitionShort: text("competition_short").notNull(),
   teamApiId: integer("team_api_id").notNull(),
@@ -76,7 +76,7 @@ export const footballTeams = pgTable("football_teams", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
-export const footballPlayers = pgTable("football_players", {
+export const footballPlayers = pgTable("football_squad_players", {
   id: uuid("id").primaryKey().defaultRandom(),
   teamApiId: integer("team_api_id").notNull(),
   teamName: text("team_name").notNull(),

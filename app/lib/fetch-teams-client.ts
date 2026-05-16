@@ -54,7 +54,7 @@ export async function fetchFootballTeams(
   const supabase = createSupabaseClient();
   if (!supabase) return [];
   const { data } = await supabase
-    .from("football_teams")
+    .from("football_team_details")
     .select(TEAM_COLS)
     .eq("competition_short", competitionShort)
     .order("name", { ascending: true });
@@ -72,7 +72,7 @@ export async function fetchFootballPlayersByTeam(
   const supabase = createSupabaseClient();
   if (!supabase) return [];
   const { data } = await supabase
-    .from("football_players")
+    .from("football_squad_players")
     .select(PLAYER_COLS)
     .eq("competition_short", competitionShort)
     .eq("team_api_id", teamApiId)
