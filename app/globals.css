@@ -43,7 +43,12 @@ html.light {
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
-html { scroll-behavior: smooth; font-size: 16px; }
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
 
 body {
   font-family: var(--font-outfit, 'Outfit', sans-serif);
@@ -51,8 +56,21 @@ body {
   color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
+  max-width: 100vw;
   line-height: 1.5;
 }
+
+/* Fluid spacing scale — used by navbar / hero / main / footer.
+   `clamp(min, preferred, max)` shrinks gracefully from desktop to mobile. */
+:root {
+  --page-x: clamp(0.85rem, 3vw, 1.5rem);
+  --page-y: clamp(1rem, 3vw, 1.5rem);
+  --card-pad: clamp(1rem, 2.5vw, 1.4rem);
+  --gap-grid: clamp(0.85rem, 2vw, 1.5rem);
+}
+
+/* Prevent any descendant from breaking the viewport width. */
+img, svg, video, canvas, iframe { max-width: 100%; }
 
 /* AMBIENT BG */
 .ambient-bg {
@@ -82,12 +100,12 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
   display: flex;
   align-items: center;
   height: 60px;
-  padding: 0 1.5rem;
-  gap: 1rem;
+  padding: 0 var(--page-x);
+  gap: clamp(0.5rem, 2vw, 1rem);
 }
 .logo {
   font-family: var(--font-bebas-neue, 'Bebas Neue', sans-serif);
-  font-size: 1.6rem;
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
   letter-spacing: 2px;
   display: flex;
   align-items: center;
@@ -108,10 +126,18 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
   color: #fff;
   font-family: var(--font-outfit, sans-serif);
 }
-.sport-group-tabs { display: flex; gap: 0; flex-shrink: 0; }
+.sport-group-tabs {
+  display: flex;
+  gap: 0;
+  min-width: 0;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.sport-group-tabs::-webkit-scrollbar { height: 0; }
 .sport-group-tab {
-  padding: 0.4rem 0.9rem;
-  font-size: 0.75rem;
+  padding: 0.4rem clamp(0.55rem, 2vw, 0.9rem);
+  font-size: clamp(0.7rem, 2vw, 0.75rem);
   font-weight: 600;
   cursor: pointer;
   color: var(--text-muted);
@@ -163,7 +189,7 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
 .comp-bar-inner {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--page-x);
   display: flex;
   align-items: center;
   gap: 0;
@@ -196,9 +222,10 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
 .main-content {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 1.5rem 1.5rem 4rem;
+  padding: var(--page-y) var(--page-x) clamp(2rem, 6vw, 4rem);
   position: relative;
   z-index: 1;
+  min-width: 0;
 }
 
 @keyframes fadeUp {
@@ -214,14 +241,15 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
 .section-hero {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  padding: 1.1rem 1.4rem;
+  gap: clamp(0.65rem, 2vw, 1rem);
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
+  padding: clamp(0.85rem, 2.5vw, 1.1rem) clamp(1rem, 3vw, 1.4rem);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
+  flex-wrap: wrap;
 }
 .section-hero .hero-bar {
   position: absolute;
@@ -231,18 +259,33 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
   height: 100%;
   border-radius: 4px 0 0 4px;
 }
-.hero-icon { font-size: 1.8rem; flex-shrink: 0; margin-left: 8px; width: 2.4rem; height: 2.4rem; display: inline-flex; align-items: center; justify-content: center; }
+.hero-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  margin-left: clamp(2px, 1vw, 8px);
+  width: clamp(1.8rem, 6vw, 2.4rem);
+  height: clamp(1.8rem, 6vw, 2.4rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .hero-icon img { width: 100%; height: 100%; object-fit: contain; }
+.hero-text { min-width: 0; flex: 1; }
 .hero-text h2 {
   font-family: var(--font-bebas-neue, 'Bebas Neue', sans-serif);
-  font-size: 1.9rem;
-  letter-spacing: 3px;
+  font-size: clamp(1.25rem, 5vw, 1.9rem);
+  letter-spacing: clamp(1.5px, 0.6vw, 3px);
   line-height: 1;
+  word-break: break-word;
 }
-.hero-text p { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.1rem; }
+.hero-text p {
+  font-size: clamp(0.68rem, 1.6vw, 0.75rem);
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
 .hero-badge {
   margin-left: auto;
-  font-size: 0.58rem;
+  font-size: clamp(0.55rem, 1.4vw, 0.58rem);
   font-weight: 700;
   padding: 0.25rem 0.65rem;
   border-radius: var(--radius-sm);
@@ -252,7 +295,13 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
 }
 
 /* GRID */
-.grid-12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; }
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--gap-grid);
+  min-width: 0;
+}
+.grid-12 > * { min-width: 0; }
 .span-4 { grid-column: span 4; }
 .span-5 { grid-column: span 5; }
 .span-6 { grid-column: span 6; }
@@ -294,8 +343,9 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1.4rem;
+  padding: var(--card-pad);
   transition: var(--transition);
+  min-width: 0;
 }
 .card:hover { border-color: #ffffff12; transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.2rem; }
@@ -312,8 +362,14 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
 }
 .card-action:hover { text-decoration: underline; }
 
-/* STANDINGS TABLE */
-.standings-table { width: 100%; border-collapse: collapse; }
+/* STANDINGS TABLE — table scrolls inside its card on narrow viewports;
+   the page itself never scrolls horizontally. */
+.card:has(> .standings-table),
+.card:has(> table.standings-table) {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.standings-table { width: 100%; border-collapse: collapse; min-width: 480px; }
 .standings-table th {
   font-size: 0.58rem;
   text-transform: uppercase;
@@ -539,13 +595,63 @@ html.light .navbar { background: rgba(241, 245, 249, 0.92); }
 .sp-footer {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: clamp(1.25rem, 4vw, 2rem) var(--page-x);
   border-top: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   font-size: 0.7rem;
   color: var(--text-muted);
   position: relative;
   z-index: 1;
+}
+
+/* TABLET (≤768px) — tighter spacing, slightly smaller body type */
+@media (max-width: 768px) {
+  .navbar-inner { height: 54px; }
+  .logo .logo-icon { width: 24px; height: 24px; font-size: 0.65rem; }
+  .nav-right { gap: 0.5rem; }
+  .nav-live { font-size: 0.62rem; }
+  .standings-table th { font-size: 0.55rem; padding: 0.4rem 0.25rem; }
+  .standings-table td { font-size: 0.72rem; padding: 0.45rem 0.25rem; }
+  .standings-table td:not(:first-child):not(:nth-child(2)) { font-size: 0.7rem; }
+  .fixture-item { padding: 0.55rem 0; }
+  .fixture-team { font-size: 0.74rem; }
+  .fixture-score { font-size: 1.2rem; min-width: 40px; }
+  .race-name { font-size: 0.74rem; }
+  .race-date { font-size: 0.62rem; }
+  .driver-bar-name { width: 70px; font-size: 0.7rem; }
+  .driver-bar-pts { font-size: 0.74rem; width: 28px; }
+  .scorecard-header, .scorecard-body { padding: 0.6rem 0.85rem; }
+  .scorecard-team-score { font-size: 0.88rem; }
+}
+
+/* PHONE (≤480px) — compact layout, single-column friendly */
+@media (max-width: 480px) {
+  .sport-group-tab { padding: 0.4rem 0.55rem; }
+  .nav-live { display: none; }
+  .section-hero { gap: 0.6rem; padding: 0.85rem 1rem; }
+  .hero-icon { margin-left: 0; width: 1.8rem; height: 1.8rem; }
+  .hero-text h2 { letter-spacing: 1.5px; }
+  .hero-badge {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+    order: 99;
+  }
+  .standings-table th { font-size: 0.5rem; }
+  .standings-table td { font-size: 0.7rem; padding: 0.4rem 0.2rem; }
+  .pos-num { font-size: 0.7rem; width: 16px; }
+  .team-cell { gap: 0.35rem; }
+  .driver-bar-name { width: 56px; font-size: 0.66rem; }
+  .driver-bar-fill { font-size: 0.6rem; }
+  .race-circuit { font-size: 0.58rem; }
+  .race-flag { font-size: 0.85rem; width: 18px; }
+  .race-round { font-size: 1rem; width: 22px; }
+  .scorecard-match { font-size: 0.74rem; }
+  .scorecard-team-name { font-size: 0.76rem; }
+  .scorecard-team-score { font-size: 0.85rem; }
+  .sp-footer { justify-content: center; text-align: center; }
 }
