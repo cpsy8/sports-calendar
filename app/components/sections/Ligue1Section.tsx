@@ -136,7 +136,7 @@ export function Ligue1Section() {
         </div>
       )}
 
-      {activeTab === "stats" && <ScorersTab competitionShort="LIG" accent={ACCENT} />}
+      {activeTab === "stats" && <ScorersTab competitionShort="LIG" />}
       {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );

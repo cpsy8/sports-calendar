@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## MUST FOLLOW — Branch sync rule (strict)
+
+**Always pull the latest `main` from the remote before any of the following:**
+
+1. **Creating a new branch.** Run `git fetch origin && git checkout -b <new-branch> origin/main`. Never branch from a stale local `main`.
+2. **Resuming work on a branch whose previous PR was already merged**, or any feature branch that has fallen behind `main`. Run `git fetch origin && git merge origin/main` (or rebase) before making new commits, and push again.
+
+Never skip this step. Stale branches cause merge conflicts and silently miss upstream fixes. If the merge has conflicts, resolve them — do not abort and continue on the stale base.
+
 ## Commands
 
 ```bash

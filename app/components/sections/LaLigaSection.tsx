@@ -136,7 +136,7 @@ export function LaLigaSection() {
         </div>
       )}
 
-      {activeTab === "stats" && <ScorersTab competitionShort="LAL" accent={ACCENT} />}
+      {activeTab === "stats" && <ScorersTab competitionShort="LAL" />}
       {activeTab === "teams" && <Placeholder label="Teams" />}
     </>
   );
